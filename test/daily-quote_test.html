@@ -19,11 +19,43 @@
     </test-fixture>
 
     <script>
+
+      // http://localhost:8081/components/daily-quote/test/daily-quote_test.html
+
       suite('daily-quote', function() {
-        test('instantiating the element works', function() {
-          var element = fixture('basic');
+        var element;
+
+        setup(function () {
+          element = fixture("basic");
+        });
+
+        test('A01 : Instantiating the element works', function() {
           assert.equal(element.is, 'daily-quote');
         });
+
+
+
+        test('B01 : Method quotes.count() ', function() {
+          expect(element.quotes.count()).to.be.equal(6);
+        });
+        
+        test('B02 : Method quotes.languageCount() ', function() {
+          expect(element.quotes.languageCount()).to.be.equal(2);
+        });
+
+        test('B03 : Method quotes.categoryCount() ', function() {
+          expect(element.quotes.categoryCount()).to.be.equal(3);
+        });
+
+        test('B04 : Method quotes.languages() ', function() {
+          expect(element.quotes.languages().toString()).to.be.equal("EN,NL");
+        });
+
+        test('B05 : Method quotes.categories() ', function() {
+          expect(element.quotes.categories().toString()).to.be.equal("it,funny,life");
+        });
+
+        
       });
     </script>
   </body>

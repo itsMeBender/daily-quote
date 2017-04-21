@@ -14,7 +14,12 @@ Display a random quote
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+    <div> 
+      <span>[[_intro]]</span>
+      <span>[[_quote]]</span>
+      <span>[[_author]]</span>
+    </div>
+
   </template>
 
   <script>
@@ -22,12 +27,198 @@ Display a random quote
 
       is: 'daily-quote',
 
+      // Call quotes.show(language, category) whem properties are changed
+      observers: [
+        'show(language, category)',
+      ],
+
       properties: {
-        prop1: {
+
+        // Who is the author of the quote
+        _author: {
           type: String,
-          value: 'daily-quote',
+          value: '',
         },
+
+        // Quote definition, like 'Murphy`s law'
+        _intro: {
+          type: String,
+          value: '',
+        },
+
+        // The quote
+        _quote: {
+          type: String,
+          value: '',
+        },
+
+        // The quote category, like 'funny' category
+        category: {
+          type: String,
+          value: '',   // Stands for ALL categories
+        },
+
+        // Language of the presented quote. Default 'EN'.
+        language: {
+          type: String,
+          value: '',    // Stands for all languages
+        },
+
       },
+
+      // Object with quote data and methods to work with quotes
+      quotes: (function () {
+        var api = {};     // External API for quotes
+        var languages;    // Which languages are provided with quotes
+        var categories;   // Categories for quotes
+        var quotes = [
+          {l:'EN', t:"MIPS : Meaningless Information about Processor Speed.", c:"it"},
+          {l:'EN', t:"To ERROR is human!", c:"it"},
+          {l:'EN', t:"The man who falls in a vat of molten glass, makes a spectacle from himself."},
+
+          {l:'NL', t:"Mijn auto leeft: Hij rookt, hij zuipt en hij wipt.", c:"funny"},
+          {l:'NL', t:"In wereld oorlog IV vechten we met knotsen.", a:"Albert Einstein", c:"life"},
+          {l:'NL', t:"Einstein was zo geniaal dat er maar 10 mensen op de wereld hem begrijpen, mij begrijpt niemand."},
+        ];
+        var filteredQuotes = [];
+        var filterAppliedLanguage;
+        var filterAppliedCategory;
+
+        /**
+         * Filter for optional quote categories. Only one category expected!
+         * @return {array} of categories
+         */
+        function filterCategory () {
+          // Return value if already filtered.
+          if (categories) {
+            return categories;
+          }
+          categories = [];
+          quotes.forEach(function (quote) {
+            if (quote.c) {
+              if (categories.indexOf(quote.c) === -1) {
+                categories.push(quote.c);
+              }
+            }
+          });
+          return categories;
+        }
+
+        /**
+         * Filter for unique mandatory language ID's
+         * @return {array} of language ID's
+         */
+        function filterLanguages () {
+          // Return value if already filtered.
+          if (languages) {
+            return languages;
+          }
+          languages = [];
+          quotes.forEach(function (quote) {
+            if (languages.indexOf(quote.l) === -1) {
+              languages.push(quote.l);
+            }
+          });
+          return languages;
+        }
+
+        function filterQuotes (category, language) {
+
+          console.log("filterQuotes()", category, filterAppliedCategory, language, filterAppliedLanguage);
+
+          language = language.toUpperCase();
+
+          if (filterAppliedCategory !== category || filterAppliedLanguage !== language) {
+            filteredQuotes = [];
+console.log("A.");
+            // One of the filters has been changed, filter again on new parameters.
+            filterAppliedCategory = category;
+            filterAppliedLanguage = language;
+
+            if (category === '' && language === '') {
+console.log("B.");
+              // No filter used, so all quotes are VALID
+              quotes.forEach( function (quote, idx) {
+                filteredQuotes.push(idx);
+              });
+
+            } else {
+console.log("C.");
+              quotes.forEach( function (quote, idx) {
+                if ((quote.c && quote.c.indexOf(filterAppliedCategory) >= 0) && (quote.l && quote.l === filterAppliedLanguage)) {
+                  filteredQuotes.push(idx);                
+                }
+              });
+            }
+          }
+        }
+
+        /**
+         * Pick quote by index
+         * @param {Number} idx of the quote list
+         * @return {Object} quote
+         */
+        function pickOne (category, language) {
+          filterQuotes(category, language);
+          console.log("filteredQuotes:", filteredQuotes);
+          return quotes[filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)]];
+        }
+
+
+        api.categories = function () {
+          return categories || filterCategory();
+        };
+
+        api.categoryCount = function () {
+          categories = categories || filterCategory();
+          return categories.length;
+        };
+
+        api.count = function () {
+          return quotes.length;
+        };
+
+        api.languages = function () {
+          return languages || filterLanguages();
+        };
+
+        api.languageCount = function () {
+          languages = languages || filterLanguages();
+          return languages.length;
+        };
+
+        /**
+         * Generate new quote, based on language and category
+         */
+        api.show = function (prop, category, language) {
+          var newQuote;
+          console.log("api.show()", category, language);
+          // Sanitize check
+          if (language && this.languages().toString().indexOf(language) === -1) {
+            this._quote = "No quotes available for language '" + language + "'.";
+            return;
+          }
+
+          // Sanitize check
+          if (category && this.categories().toString().indexOf(category) === -1) {
+            this._quote = "No quotes available for category '" + category + "'.";
+            return;
+          }
+
+          newQuote = pickOne(category, language);    
+          prop._intro = newQuote.i;
+          prop._quote = newQuote.t;
+          prop._author = newQuote.a;
+        }
+
+        return api;
+      })(),
+
+      // To show a new quote.
+      show: function () {
+        this.quotes.show(this, this.category, this.language);
+      },
+
 
     });
   </script>
