@@ -10,19 +10,37 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
     <link rel="import" href="../daily-quote.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
     </style>
+    <script>
+      function newRandomQuote () {
+        document.querySelector("#randomQuote").show();
+      }
+    </script>
   </head>
   <body>
     <div class="vertical-section-container centered">
-      <h3>Basic daily-quote demo</h3>
+      <h3>Randon quote from the available list.</h3>
       <demo-snippet>
         <template>
-          <daily-quote></daily-quote>
+          <daily-quote id="randomQuote"></daily-quote> 
+          <paper-button onClick="newRandomQuote()" raised>New quote</paper-button>
         </template>
       </demo-snippet>
     </div>
+
+    <div class="vertical-section-container centered">
+      <h3>Using filters</h3>
+      <p>Choose a <em>language</em> and, or a <em>category</em>.</p>
+      <demo-snippet>
+        <template>
+          <daily-quote language="EN" category="it"></daily-quote>
+        </template>
+      </demo-snippet>
+    </div>
+
   </body>
 </html>
