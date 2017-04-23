@@ -13,17 +13,47 @@ Display a random quote
       :host {
         display: block;
       }
+      .q--intro {
+        display: block;
+        font-size: 1.2em;        
+      }
+      .q--quote {
+        display: block;
+        font-size: 1.8em;
+        margin: 0.4em 0 0.6em 0em;
+      }
+      .q--author {
+        display: block;
+        text-align: right;
+        font-style: italic;
+        font-size: 1.2em;
+        margin-right: 4em;
+      }
     </style>
     <div> 
-      <span>[[_intro]]</span>
-      <span>[[_quote]]</span>
-      <span>[[_author]]</span>
+      <template is="dom-if" if="[[_hasContent(_intro)]]">
+        <span class="q--intro">[[_intro]]</span>
+      </template>
+      <template is="dom-if" if="[[_hasContent(_quote)]]">
+        <span class="q--quote">[[_quote]]</span>
+      </template>
+      <template is="dom-if" if="[[_hasContent(_author)]]">
+        <span class="q--author">[[_author]]</span>
+      </template>
     </div>
 
   </template>
 
   <script>
     Polymer({
+
+      // True when there is content to show.
+      _hasContent: function (text) {
+        if (text && text != '') {
+          return true;
+        }
+        return false;
+      },
 
       is: 'daily-quote',
 
@@ -71,14 +101,279 @@ Display a random quote
         var api = {};     // External API for quotes
         var languages;    // Which languages are provided with quotes
         var categories;   // Categories for quotes
-        var quotes = [
-          {l:'EN', t:"MIPS : Meaningless Information about Processor Speed.", c:"it"},
-          {l:'EN', t:"To ERROR is human!", c:"it"},
-          {l:'EN', t:"The man who falls in a vat of molten glass, makes a spectacle from himself."},
 
-          {l:'NL', t:"Mijn auto leeft: Hij rookt, hij zuipt en hij wipt.", c:"funny"},
-          {l:'NL', t:"In wereld oorlog IV vechten we met knotsen.", a:"Albert Einstein", c:"life"},
-          {l:'NL', t:"Einstein was zo geniaal dat er maar 10 mensen op de wereld hem begrijpen, mij begrijpt niemand."},
+        // l:Language, q:Quote, a:Author, c:Catagory (one)
+        var quotes = [
+          {l:'EN', q:"Life is hard and then you die!"},
+          {l:'EN', q:"The disbelievers say! 'HO!', this is a mere wizard.", a:"Quran, Surak"},
+          {l:'EN', q:"Death is life's away of telling you've been fired."},
+          {l:'EN', q:"CPU time flies when you have a lot of bugs.", c:"computer"},
+          {l:'EN', q:"It is hard to make the world go away when it has decided to notice you.", a:"Spock's World"},
+          {l:'EN', q:"Question authority and the authorities will question you."},
+          {l:'EN', q:"I don't ever remember forgetting anything.", a:"Chris Rende"},
+          {l:'EN', q:"All of us is smarter than each of us."},
+          {l:'EN', q:"Of all the things I've lost, i miss my mind the most."},
+          {l:'EN', q:"MIPS : Meaningless Information about Processor Speed.", c:"computer"},
+          {l:'EN', q:"To ERROR is human!", c:"computer"},
+          {l:'EN', q:"The man who falls in a vat of molten glass, makes a spectacle from himself."},
+          {l:'EN', q:"You may think you're smart, but you're STUPID! But, you've met your match in ME!", a:"Col. Pierce"},
+          {l:'EN', q:"Nobody knows what I'm saying, I don't even know what I'm saying."},
+          {l:'EN', q:"It's all about people; not you and me or him and her, but 'US'"},
+          {l:'EN', q:"I give in, to sin, because you have to make this life livable.", a:"Martin Gore"},
+          {l:'EN', q:"The universe is not only stranger than we imagine, it is stranger than we can imagine.", a:"M.B.G. Haldene"},
+          {l:'EN', q:"We the unwilling, led by the unknowing, are doing the impossible for the ungratefull."},
+          {l:'EN', q:"I'm all in favor of keeping dangerous weapons out of the hands of fools. Let's start with typewriters.", a:"Solomon Shout"},
+          {l:'EN', i:"To summarize the summary of the summary", q:"People are the problem."},
+          {l:'EN', q:"It takes less time to do a thing right, than to explane why you did it wrong.", a:"Longfellow"},
+          {l:'EN', q:"Studying is the only way to do nothing without anyone blaming you.", a:"m. Teitinen, Student of Computer Science."},
+          {l:'EN', q:"All stessed out and nobody to choke."},
+          {l:'EN', q:"NO this mind is not for rent, to any god or gouverment.", a:"Rush."},
+          {l:'EN', q:"Our policy is to always blame the computer.", c:"computer"},
+          {l:'EN', q:"Nature sides with the hidden flaw."},
+          {l:'EN', i:"Ralph's Observation", q:"It is a mistake to allow any mechanical object to realize that you are in a hurry."},
+          {l:'EN', i:"Cole's Law", q:"Thinly sliced cabbage."},
+          {l:'EN', q:"Time flies like an arrow, but fruit flies like a banana."},
+          {l:'EN', i:"Firestone's Law of Forcasting", q:"Chicken Little only has to be right once."},
+          {l:'EN', i:"Manly's Maxim", q:"Logic is a systematic method of coming to the wrong conclusion with confidence."},
+          {l:'EN', i:"Moer's truism", q:"The trouble with most jobs is the job holder's resemblence to being one of a sled dog team. No one gets a change of scenery except the lead dog."},
+          {l:'EN', i:"Cannon's Comment", q:"If you tell the boss you were late for work because you had a flat tire, the next morning you will have a flat tire.", c:"office"},
+          {l:'EN', i:"Murphy's law", q:"If anything can go wrong, it will.", c:"life"},
+          {l:'EN', i:"Murphy's Corollary", q:"Left to themselves, things tend to go from bad to worse.", c:"science"},
+          {l:'EN', i:"Murphy's Corollary", q:"It is impossible to make anything foolproof because fools are so ingenious", c:"science"},
+          {l:'EN', i:"Murphy's Constant", q:"Matter will be damaged in direct proportion to its value"},
+          {l:'EN', i:"Quantized Revision of Murphy's Law", q:"Everything goes wrong all at once."},
+          {l:'EN', i:"O'Toole's Commentary", q:"Murphy was an optimist."},
+          {l:'EN', i:"Scott's Second Law", q:"When an error has been detected and corrected, it will be found to have been correct in the first place."},
+          {l:'EN', i:"Finagle's First Law", q:"If an experiment works, something has gone wrong."},
+          {l:'EN', i:"Finagle's Second Law", q:"No matter what the experiment's result, there will always be someone eager to: (a) misinterpret it. (b) fake it. or (c) believe it supports his own pet theory."},
+          {l:'EN', i:"Finagle's Third Law", q:"In any collection of data, the figure most obviously correct, beyond all need of checking, is the mistake."},
+          {l:'EN', i:"Finagle's Fourth Law", q:"Once a job is fouled up, anything done to improve it only makes it worse."},
+          {l:'EN', i:"Gumperson's Law", q:"The probability of anything happening is in inverse ratio to its desirability."},
+          {l:'EN', i:"Rudin's Law", q:"In crises that force people to choose among alternative courses of action, most people will choose the worst one possible."},
+          {l:'EN', i:"Ginsberg's Restatement of the Three Laws of Thermodynamics", q:"You can't win. You can't break even. You can't quit."},
+          {l:'EN', i:"Ehrman's Commentary on 'Things will get worse before they will get better.'", q:"Who said things would get better?"},
+          {l:'EN', i:"Commoner's Second Law of Ecology", q:"Nothing ever goes away."},
+          {l:'EN', i:"Howe's Law", q:"Everyone has a scheme that will not work."},
+          {l:'EN', i:"Zymurgy's First Law of Evolving Systems Dynamics", q:"Once you open a can of worms, the only way to recan them is to use a bigger can."},
+          {l:'EN', i:"Non-Reciprocal Law of Expectations", q:"Negative expectations yield negative results. Positive expectations yield negative results."},
+          {l:'EN', i:"Klipstein's Law", q:"Tolerances will accumulate unidirectionally toward maximum difficulty of assembly. Interchangeable parts won't."},
+          {l:'EN', q:"You never find a lost article until you replace it."},
+          {l:'EN', i:"Glatum's Law of Materialistic Acquisitiveness", q:"The perceived usefulness of an article is inversely proportional to its actual usefulness once bought and paid for."},
+          {l:'EN', i:"Lewis' Law", q:"No matter how long or hard you shop for an item, after you've bought it, it will be on sale somewhere cheaper."},
+          {l:'EN', q:"If nobody uses it, there's a reason."},
+          {l:'EN', q:"You get the most of what you need the least."},
+          {l:'EN', i:"The Airplane Law", q:"When the plane you are on is late, the plane you want to transfer to is on time."},
+          {l:'EN', i:"Etorre's Observation", q:"The other line moves faster."},
+          {l:'EN', i:"First Law of Revision", q:"Information necessitiating a change of design will be conveyed to the designer after - and only after - the plans are complete. (Often called the 'Now They Tell Us' Law)"},
+          {l:'EN', i:"Second Law of Revision", q:"The more innocuous the modification appears to be, the further its influence will extend and the more plans will have to be redrawn."},
+          {l:'EN', i:"Corollary to the First Law of Revision", q:"In simple cases, presenting one obvious right way versus one obvious wrong way, it is often wiser to choose the wrong way, so as to expedite subsequent revision."},
+          {l:'EN', i:"Laws of computer programming: I.", q:"Any given program, when running, is obsolete.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: II.", q:"Any given program costs more and takes longer.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: III.", q:"If a program is useful, it will have to be changed.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: IV.", q:"If a program is useless, it will have to be documented.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: V.", q:"Any program will expand to fill available memory.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: VI.", q:"The value of a program is proportional to the weight of its output.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: VII.", q:"Program complexity grows until it exceeds the capabilities of the programmer who must maintain it.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: VIII.", q:"Any non-trivial program contains at least one bug.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: IX.", q:"Undetectable errors are infinite in variety, in contrast to detectable errors, which by definition are limited.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: X.", q:"Adding manpower to a late software project makes it later.", c:"computer"},
+          {l:'EN', i:"Lubarsky's Law of Cybernetic Entomology", q:"There's always one more bug.", c:"computer"},
+          {l:'EN', i:"Shaw's Principle", q:"Build a system that even a fool can use, and only a fool will want to use it.", c:"computer"},
+          {l:'EN', i:"Law of the Perversity of Nature", q:"You cannot successfully determine beforehand which side of the bread to butter."},
+          {l:'EN', i:"Law of Selective Gravity", q:"An object will fall so as to do the most damage."},
+          {l:'EN', i:"Jennings Corollary to the Law of Selective Gravity", q:"The chance of the bread falling with the butter side down is directly proportional to the value of the carpet."},
+          {l:'EN', i:"Wyszkowski's Second Law", q:"Anything can be made to work if you fiddle with it long enough."},
+          {l:'EN', i:"Sattinger's Law", q:"It works better if you plug it in."},
+          {l:'EN', i:"Lowery's Law", q:"If it jams - force it. If it breaks, it needed replacing anyway."},
+          {l:'EN', i:"Schmidt's Law", q:"If you mess with a thing long enough, it'll break."},
+          {l:'EN', i:"Anthony's Law of Force", q:"Don't force it - get a bigger hammer."},
+          {l:'EN', i:"Cahn's Axiom", q:"When all else fails, read the instructions."},
+          {l:'EN', i:"Gordon's First Law", q:"If a project is not worth doing at all, it's not worth doing well."},
+          {l:'EN', i:"Law of Research", q:"Enough research will tend to support your theory."},
+          {l:'EN', i:"Maier's Law", q:"If the facts do not conform to the theory, they must be disposed of."},
+          {l:'EN', i:"Peer's Law", q:"The solution to the problem changes the problem."},
+          {l:'EN', q:"Beware of the man who works hard to learn something, learns it, and finds himself no wiser than before. He is full of murderous resentment of people who are ignorant without having come by their ignorance the hard way.     - Bokonon"},
+          {l:'EN', q:"Help a man when he is in trouble and he will remember you when he is in trouble again."},
+          {l:'EN', q:"You can lead a man to slaughter, but you can't make him think."},
+          {l:'EN', q:"Don't get mad, get even."},
+          {l:'EN', i:"Carson's Law", q:"It's better to be rich and healthy than poor and sick."},
+          {l:'EN', i:"The Golden Rule", q:"He who has the gold, makes the rules."},
+          {l:'EN', i:"Mark's mark", q:"Love is a matter of chemistry; sex is a matter of physics."},
+          {l:'EN', i:"Korman's conclusion", q:"The trouble with resisting temptation is it may never come your way again."},
+          {l:'EN', i:"Knight's Law", q:"Life is what happens to you while you are making other plans."},
+          {l:'EN', i:"Maugham's Thought", q:"Only a mediocre person is always at his best."},
+          {l:'EN', i:"Krueger's Observation", q:"A taxpayer is someone who does not have to take a civil service exam in order to work for the government."},
+          {l:'EN', i:"Benchley's Law of Distinction", q:"There are two kinds of people in the world, those who believe there are two kinds of people in the world and those who don't."},
+          {l:'EN', i:"Harver's Law", q:"A drunken man's words are a sober man's thoughts."},
+          {l:'EN', i:"Schmidt's Observation", q:"All things being equal, a fat person uses more soap than a thin person."},
+          {l:'EN', i:"Gibb's Law", q:"Infinity is one lawyer waiting for another."},
+          {l:'EN', q:"Fools rush in where fools have been before."},
+          {l:'EN', i:"Rule of Accuracy", q:"When working towards the solution of a problem, it always helps if you know the answer."},
+          {l:'EN', q:"Inside every small problem is a large problem struggling to get out."},
+          {l:'EN', i:"Wyszowski's Law", q:"No experiment is reproducible."},
+          {l:'EN', i:"Fett's Law", q:"Never replicate a successful experiment."},
+          {l:'EN', i:"Brooke's Law", q:"Whenever a system becomes completely defined, some damn fool discovers something which either abolishes the system or expands it beyond recognition."},
+          {l:'EN', i:"The first Myth of Management", q:"It exists."},
+          {l:'EN', q:"Spend sufficient time confirming the need and the need will disappear."},
+          {l:'EN', i:"Peter's Placebo", q:"An ounce of image is worth a pound of performance."},
+          {l:'EN', i:"Zymurgy's Law of Volunteer Labour", q:"People are always available for work in the past tense."},
+          {l:'EN', i:"Wiker's Law", q:"Government expands to absorb revenue and then some."},
+          {l:'EN', i:"Clarke's First Law", q:"When a distinguished but elderly scientist states that something is possible, he is almost certainly right. When he states that something is impossible, he is very probably wrong."},
+          {l:'EN', i:"Clarke's Third Law", q:"Any sufficiently advanced technology is indistinguishable from magic."},
+          {l:'EN', i:"Segal's Law", q:"A man with a watch knows what time it is. A man with two watches is never sure."},
+          {l:'EN', i:"Weiler's Law", q:"Nothing is impossible for the man who does not have to do it himself."},
+          {l:'EN', i:"Weinberg's Second Law", q:"If builders built buildings the way programmers wrote programs, the first woodpecker to come along would destroy civilization."},
+          {l:'EN', i:"Hartley's Second Law", q:"Never go to bed with anybody crazier than you are."},
+          {l:'EN', i:"Beckhap's Law", q:"Beauty times brains equals a constant."},
+          {l:'EN', i:"Katz's Law", q:"Men and women will act rationally when all other possibilities have been exhausted."},
+          {l:'EN', i:"Cole's Axiom", q:"The sum of the intelligence on the planet is a constant; the population is growing."},
+          {l:'EN', i:"Vique's Law", q:"A man without a religion is like a fish without a bicycle."},
+          {l:'EN', i:"Jone's Motto", q:"Friends come and go but enemies accumulate."},
+          {l:'EN', i:"Churchill's commentary on man", q:"Man will occasionally stumble over the truth, but most of the time he will pick himself up and continue on."},
+          {l:'EN', i:"The ultimate Law", q:"All general statements are false."},
+          {l:'EN', i:"The Unspeakable Law", q:"As soon as you mention something; if it is good, it goes away. if it is bad, it happens."},
+          {l:'EN', i:"The Whispered Rule", q:"People will believe anything if you whisper it."},
+          {l:'EN', i:"The First Law of Wing Walking", q:"Never let hold of what you've got until you've got hold of something else."},
+          {l:'EN', q:"Eat a live toad the first thing in the morning and nothing worse will happen to you the rest of the day."},
+          {l:'EN', i:"Farnsdick's corollary", q:"After things have gone from bad to worse, the cycle will repeat itself."},
+          {l:'EN', i:"Lynch's Law", q:"When the going gets tough, everybody leaves."},
+          {l:'EN', i:"Law of Revelation", q:"The hidden flaw never remains hidden."},
+          {l:'EN', i:"Langsam's Law", q:"Everything depends."},
+          {l:'EN', i:"Hellrung's Law", q:"If you wait, it will go away.  Shevelson's Extension: ... having done its damage.  Grelb's Addition: ... if it was bad, it will be back."},
+          {l:'EN', i:"Grossman's Misquote", q:"Complex problems have simple, easy to understand wrong answers."},
+          {l:'EN', i:"Ducharme's Precept", q:"Opportunity always knocks at the least opportune moment."},
+          {l:'EN', i:"First Postulate of Isomurphism", q:"Things equal to nothing else are equal to each other."},
+          {l:'EN', i:"The Unapplicable Law", q:"Washing your car to make it rain doesn't work."},
+          {l:'EN', i:"Witten's Law", q:"Whenever you cut your fingernails, you will find a need for them an hour later."},
+          {l:'EN', i:"Perkin's postulate", q:"The bigger they are, the harder they hit."},
+          {l:'EN', i:"Harrison's Postulate", q:"For every action, there is an equal and opposite criticism."},
+          {l:'EN', i:"Conway's Law", q:"In every organization there will always be one person who knows what is going on  This person must be fired."},
+          {l:'EN', i:"Stewart's Law of Retroaction", q:"It is easier to get forgiveness than permission."},
+          {l:'EN', i:"MacDonald's Second Law", q:"Consultants are mystical people who ask a company for a number and give it back to them."},
+          {l:'EN', i:"First Law of Laboratory Work", q:"Hot glass looks exactly the same as cold glass."},
+          {l:'EN', i:"Handy Guide to Modern Science", q:"1.  If it's green or it wiggles, it's biology. 2.  If it stinks, it's chemistry. 3.  If it doesn't work, it's physics."},
+          {l:'EN', q:"To err is human, but to really foul things up requires a computer."},
+          {l:'EN', i:"The Sausage Principle", q:"People who love sausage and respect the law should never watch either one being made."},
+          {l:'EN', i:"Horngren's Observation", q:"(generalized) The real world is a special case."},
+          {l:'EN', i:"Merkin's Maxim", q:"When in doubt, predict that the present trend will continue."},
+          {l:'EN', i:"Hawkin's Theory of Progress", q:"Progress does not consist of replacing a theory that is wrong with one that is right. It consists of replacing a theory that is wrong with one that is more subtly wrong."},
+          {l:'EN', q:"Never attribute to malice that which is adequately explained by stupidity."},
+          {l:'EN', i:"Matz's warning", q:"Beware of the physician who is great at getting out of trouble."},
+          {l:'EN', i:"Gold's Law", q:"If the shoe fits, it's ugly."},
+          {l:'EN', i:"Lewis' Law", q:"People will buy anything that's one to a customer."},
+          {l:'EN', i:"Law of Reruns", q:"If you have watched a TV series only once, and you watch it again, it will be a rerun of the same episode."},
+          {l:'EN', i:"Shirley's Law", q:"Most people deserve each other."},
+          {l:'EN', q:"Forgive and remember."},
+          {l:'EN', i:"Woltman's Law", q:"Never program and drink beer at the same time."},
+          {l:'EN', i:"Gallois' Revelation", q:"If you put tomfoolery into a computer, nothing comes out but tomfoolery. But this tomfoolery, having passed through a very expensive machine, is somehow enobled, and no one dares to criticize it   ."},
+          {l:'EN', i:"Galbraith's Law of Political Wisdom", q:"Anyone who says he is not going to resign, four times, definitely will."},
+          {l:'EN', i:"Allen's Law", q:"Almost anything is easier to get into than out of."},
+          {l:'EN', i:"Allen's Axiom", q:"When all else fails, follow instructions."},
+          {l:'EN', i:"Allen's Distinction", q:"The lion and the calf shall lie down together, but the calf won't get much sleep."},
+          {l:'EN', q:"You can lead a horticulture, but you can't make her think."},
+          {l:'EN', i:"Avery's Observation", q:"It does not matter if you fall down as long as you pick up something from the floor while you get up."},
+          {l:'EN', i:"Berra's Law", q:"You can observe a lot just by watching."},
+          {l:'EN', i:"Bicycle Law", q:"All bicycles weigh 50 pounds: A 30 pound bicycle needs a 20 pound lock. A 40 pound bicycle needs a 10 pound lock. A 50 pound bicycle doesn't need a lock."},
+          {l:'EN', i:"Cohen's Law", q:"What really matters is the name you succeed in imposing on the facts, not the facts themselves."},
+          {l:'EN', i:"Colson's Law", q:"When you've got them by the balls, their hearts and minds will follow."},
+          {l:'EN', i:"Comin's Law", q:"People will accept your idea much more readily if you tell them Benjamin Franklin said it first."},
+          {l:'EN', i:"Fourth Law of Thermodynamics", q:"If the probability of success is not almost one, then it is damned near zero."},
+          {l:'EN', i:"Gerrold's Laws of Infernal Dynamics", q:"1. An object in motion will be heading in the wrong direction. 2. An object at rest will be in the wrong place."},
+          {l:'EN', i:"Goldwyn's Law of Contracts", q:"A verbal contract isn't worth the paper it's written on."},
+          {l:'EN', i:"Jacquin's Postulate on Democratic Government", q:"No man's life, liberty, or property are safe while the legislature is in session."},
+          {l:'EN', i:"Jone's Principle", q:"Needs are a function of what other people have."},
+          {l:'EN', i:"Langin's Law", q:"If things were left to chance, they'd be better."},
+          {l:'EN', q:"In America, it's not how much an item costs that matters, it's how much you save."},
+          {l:'EN', q:"If you can keep your head when all about you are losing theirs, maybe you just don't understand the situation."},
+          {l:'EN', i:"Mencken's Meta law", q:"For every human problem, there is a neat, simple solution; and it is always wrong."},
+          {l:'EN', i:"Sevareid's Law", q:"The chief cause of problems is solutions."},
+          {l:'EN', i:"Thoreau's Law", q:"If you see a man approaching you with the obvious intention of doing you good, you should run for your life."},
+          {l:'EN', i:"Peer's Law", q:"The solution to the problem changes the problem."},
+          {l:'EN', q:"Never play leapfrog with a unicorn."},
+          {l:'EN', i:"Lyall's Conjecture", q:"If a computer cable has one end, then it has another."},
+          {l:'EN', i:"Lyall's Fundamental Observation", q:"The most important leg of a three legged stool is the one that's missing."},
+          {l:'EN', i:"Pournelle's Law of Costs and Schedules", q:"Everything costs more and takes longer."},
+          {l:'EN', i:"Klipstein's Lament", q:"All warranty and guarantee clauses are voided by payment of the invoice."},
+          {l:'EN', i:"Klipstein's Observation", q:"Any product cut to length will be too short."},
+          {l:'EN', i:"Sueker's Note", q:"If you need n items of anything, you will have n - 1 in stock."},
+          {l:'EN', i:"Rosenfield's Regret", q:"The most delicate component will be dropped."},
+          {l:'EN', i:"de la Lastra's Law", q:"After the last of 16 mounting screws has been removed from an access cover, it will be discovered that the wrong access cover has been removed."},
+          {l:'EN', i:"de la Lastra's Corollary", q:"After an access cover has been secured by 16 hold-down screws, it will be discovered that the gasket has been ommitted."},
+          {l:'EN', q:"Design flaws travel in groups."},
+          {l:'EN', q:"You can't fight the law of conservation of energy but you sure can bargain with it."},
+          {l:'EN', i:"Gerrold's Fundamental Truth", q:"It's a good thing money can't buy happiness. We couldn't stand the commercials."},
+          {l:'EN', i:"Gerrold's Law", q:"A little ignorance can go a long way.  Lyall's Addendum: ... in the direction of maximum harm."},
+          {l:'EN', i:"Gerrold's Pronouncement", q:"The difference between a politician and a snail is that a snail leaves its slime behind."},
+          {l:'EN', q:"When a man laughs at his misfortunes, he loses a great many friends. They never forgive the loss of their perogative.", a:"H. L. Mencken"},
+          {l:'EN', q:"An idealist is one who, on noticing that roses smell better than a cabbage, concludes that it will also make better soup.", a:"H. L. Mencken"},
+          {l:'EN', q:"Whenever you hear a man speak of his love for his country, it is a sure sign he expects to be paid for it.", a:"H. L. Menchen"},
+          {l:'EN', q:"Democracy is the theory that the common people know what they want and deserve to get it good and hard.", a:"H.L. Menchen"},
+          {l:'EN', q:"A judge is a law student who marks his own examination papers.", a:"H. L. Menchen"},
+          {l:'EN', i:"Arcana Coelestica", q:"Archbishop - A Christian ecclesiastic of a rank superior to that obtained by Christ.", a:"H. L. Menchen"},
+          {l:'EN', i:"Arcana Coelestica", q:"Puritanism - The haunting fear that someone, somewhere, may be happy.", a:"H. L. Menchen"},
+          {l:'EN', q:"Adultary is the application of democracy to love.", a:"H. L. Menchen"},
+          {l:'EN', i:"The Arithmetic of Cooperation", q:"When you're adding up committees there's a useful rule of thumb: that talents make a difference, and follies make a sum.", a:"Piet Hein"},
+          {l:'EN', q:"The Ultimate Wisdom Philosophers must ultimately find their true perfection in knowing all the follies of mankind by introspection.", a:"Piet Hein"},
+          {l:'EN', i:"Murphy's Military Laws", q:"1. Never share a foxhole with anyone braver than you are."},
+          {l:'EN', i:"Murphy's Military Laws", q:"2. No battle plan ever survives contact with the enemy."},
+          {l:'EN', i:"Murphy's Military Laws", q:"3. Friendly fire ain't."},
+          {l:'EN', i:"Murphy's Military Laws", q:"4. The most dangerous thing in the combat zone   is an officer with a map."},
+          {l:'EN', i:"Murphy's Military Laws", q:"5. The problem with taking the easy way out is   that the enemy has already mined it."},
+          {l:'EN', i:"Murphy's Military Laws", q:"6. The buddy system is essential to your survival;   it gives the enemy somebody else to shoot at."},
+          {l:'EN', i:"Murphy's Military Laws", q:"7. The further you are in advance of your own positions,   the more likely your artillery will shoot short."},
+          {l:'EN', i:"Murphy's Military Laws", q:"8. Incoming fire has the right of way."},
+          {l:'EN', i:"Murphy's Military Laws", q:"9. If your advance is going well, you are walking into an ambush."},
+          {l:'EN', i:"Murphy's Military Laws", q:"10. The quartermaster has only two sizes, too large and too small."},
+          {l:'EN', i:"Murphy's Military Laws", q:"11. If you really need an officer in a hurry, take a nap."},
+          {l:'EN', i:"Murphy's Military Laws", q:"12. The only time suppressive fire works is when it is used   on abandoned positions."},
+          {l:'EN', i:"Murphy's Military Laws", q:"13. The only thing more accurate than incoming enemy fire   is incoming friendly fire."},
+          {l:'EN', i:"Murphy's Military Laws", q:"14. There is nothing more satisfying that having someone take   a shot at you, and miss."},
+          {l:'EN', i:"Murphy's Military Laws", q:"15. Don't be conspicuous. In the combat zone, it draws fire. Out of the combat zone, it draws sergeants."},
+          {l:'EN', i:"Murphy's Military Laws", q:"16. If your sergeant can see you, so can the enemy."},
+          {l:'EN', i:"Conrad's Conundrum", q:"Technology don't transfer."},
+          {l:'EN', q:"Blessed are the young, for they shall inherit the national debt.", a:"Herbert Hoover"},
+          {l:'EN', q:"Nature sides with the hidden flaw."},
+          {l:'NL', q:"Mijn auto leeft: Hij rookt, hij zuipt en hij wipt.", c:"funny"},
+          {l:'NL', q:"In wereld oorlog IV vechten we met knotsen.", a:"Albert Einstein", c:"life"},
+          {l:'NL', q:"Einstein was zo geniaal dat er maar 10 mensen op de wereld hem begrijpen, mij begrijpt niemand."},
+          {l:'NL', q:"Het is makkelijker een onduidelijk programma te schrijven, dan een duidelijk programma te begrijpen.", c:"computer"},
+          {l:'NL', q:"Geboren worden is gratis, dood gaan is gratis... Alleen tussen door even geld lenen.", c:"life"},
+          {l:'NL', q:"De ultieme 'Hacker' communiceert direct met de machine, zonder gestoord te worden door een interface.", c:"computer"},
+          {l:'NL', q:"Een nietmachine niet, een naaimachine niet!"},
+          {l:'NL', q:"Ik ben van morgen met mijn goede been uit het verkeerde bed gestapt."},
+          {l:'NL', q:"Murphy: Een schone das trekt de soep van de dag aan."},
+          {l:'NL', i:"De constante van Murphy", q:" De schade aan een voorwerp is recht evenredig met de waarde ervan."},
+          {l:'NL', q:"Voel je je goed, maak je dan niet ongerust. Je komt er wel weer overheen."},
+          {l:'NL', q:"Voor een optimist is het onmogelijk om plezierig verrast te worden."},
+          {l:'NL', q:"Een alcoholicus is iemand die meer drinkt dan z'n dokter."},
+          {l:'NL', q:"Het feit dat de dokter een naam heeft voor je toestand, betekent niet dat hij weet wat het is."},
+          {l:'NL', q:"Kom binnen man, kom binnen vrouw. Bezoek brengt altijd vreugde, is het niet bij het komen, dan wel bij gaan!", a:"Berend"},
+          {l:'NL', q:"Familie heb je. Buren krijg je en vrienden maake je.", a:"Pieter"},
+          {l:'NL', q:"Een dokter kan zijn fouten begraven, maar een architect kan z'n client alleen adviseren een klimop te planten."},
+          {l:'NL', i:"De wetten van de fotograaf", q:"De mooiste opnamen doen zich voor nadat de memory stick vol staat."},
+          {l:'NL', q:"Je vindt iets altijd op de laatste plaats waar je zoekt. Je kunt altijd alles vinden wat je niet zoekt"},
+          {l:'NL', q:"Vloeken is die ene taal die alle programmeurs uitstekend beheersen.", c:"computer"},
+          {l:'NL', q:"Heet glas ziet er precies hetzelfde uit als koud glas."},
+          {l:'NL', q:"Een expert is iemand die meer en meer weet over minder en minder, totdat ze absoluut alles weten over niets."},
+          {l:'NL', i:"De bibliotheek wet", q:"Als het goed begint, loopt het slecht af.... Als het slecht begint, loopt het nog slechter af."},
+          {l:'NL', q:"Degene die snurkt, zal het eerst in slaap vallen."},
+          {l:'NL', i:"Het principe over ontwakende individualiteit.", q:"Iedereen wil zijn eigen banaan pellen."},
+          {l:'NL', i:"De wet van de spookrijder", q:"Als je tegenliggers je zwaaiend en met feestverlichting tegemoetkomen, ben jij de spookrijder waarover steeds sprake is op de radio."},
+          {l:'NL', q:"Als jij je hoofd koel weet te houden terwijl iedereen in de buurt op hol slaat, dan begrijp je het probleem niet."},
+          {l:'NL', q:"Doe vooral vandaag niet, wat je morgen ook nog kunt uitstellen."},
+          {l:'NL', q:"Als het je niet kan schelen waar je bent, dan ben je verdwaald."},
+          {l:'NL', q:"Een voorwerp valt altijd zo, dat het de grootste schade aanricht."},
+          {l:'NL', q:"Het ene moment dat je even achteroverleunt en uitrust, is dat moment dat je baas langskomt."},
+          {l:'NL', q:"Een ambtenaar wil het aantal ondergeschikten vermenigvuldigen en niet met hun concurreren. Ambtenaren maken werk voor elkaar!"},
+          {l:'NL', q:"Laat je niks betaald zetten, reken met de ander af."},
+          {l:'NL', q:"Wie een kuil graaft voor een ander .......... moet veel werk verzetten."},
+          {l:'NL', q:"Als je wakker wordt van het oorverdovende geluid van neervallende sneeuwvlokken, ben je pas echt dronken geweest."},
+          {l:'NL', q:"Als je niet op je rug kan blijven liggen, zonder je vast te houden heb je te diep in het glaasje gekeken."},
+          {l:'NL', q:"Maak je geen zorgen over wat andere mensen van je denken. Ze hebben het te druk met zich zorgen te maken over wat jij van hen denkt."},
+          {l:'NL', q:"Multifunctionele keukenhulpjes zullen geen enkele functie behoorlijk vervullen."},
+          {l:'NL', q:"Het aantal regels zal zich uitbreiden teneinde het boek vol te krijgen."},
+          {l:'NL', i:"De observatiewet", q:"Niets ziet er van veraf net zo goed uit als van dichtbij. Of: niets ziet er van dichtbij net zo goed uit als van veraf."},
+          {l:'NL', q:"Een onzorgvuldig project duurt 3 maal zo lang als gepland, een zorgvuldig gepland project duurt slechts twee maal zo lang."},
         ];
         var filteredQuotes = [];
         var filterAppliedLanguage;
@@ -124,26 +419,34 @@ Display a random quote
 
         function filterQuotes (category, language) {
 
-          console.log("filterQuotes()", category, filterAppliedCategory, language, filterAppliedLanguage);
-
           language = language.toUpperCase();
 
           if (filterAppliedCategory !== category || filterAppliedLanguage !== language) {
             filteredQuotes = [];
-console.log("A.");
+
             // One of the filters has been changed, filter again on new parameters.
             filterAppliedCategory = category;
             filterAppliedLanguage = language;
 
             if (category === '' && language === '') {
-console.log("B.");
               // No filter used, so all quotes are VALID
               quotes.forEach( function (quote, idx) {
                 filteredQuotes.push(idx);
               });
 
+            } else if (category && language === '') {
+              quotes.forEach( function (quote, idx) {
+                if ((quote.c && quote.c.indexOf(filterAppliedCategory) >= 0)) {
+                  filteredQuotes.push(idx);                
+                }
+              });
+            } else if (category === '' && language) {
+              quotes.forEach( function (quote, idx) {
+                if ((quote.l && quote.l === filterAppliedLanguage)) {
+                  filteredQuotes.push(idx);                
+                }
+              });
             } else {
-console.log("C.");
               quotes.forEach( function (quote, idx) {
                 if ((quote.c && quote.c.indexOf(filterAppliedCategory) >= 0) && (quote.l && quote.l === filterAppliedLanguage)) {
                   filteredQuotes.push(idx);                
@@ -160,10 +463,8 @@ console.log("C.");
          */
         function pickOne (category, language) {
           filterQuotes(category, language);
-          console.log("filteredQuotes:", filteredQuotes);
           return quotes[filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)]];
         }
-
 
         api.categories = function () {
           return categories || filterCategory();
@@ -192,7 +493,6 @@ console.log("C.");
          */
         api.show = function (prop, category, language) {
           var newQuote;
-          console.log("api.show()", category, language);
           // Sanitize check
           if (language && this.languages().toString().indexOf(language) === -1) {
             this._quote = "No quotes available for language '" + language + "'.";
@@ -206,9 +506,9 @@ console.log("C.");
           }
 
           newQuote = pickOne(category, language);    
-          prop._intro = newQuote.i;
-          prop._quote = newQuote.t;
-          prop._author = newQuote.a;
+          prop._intro = newQuote.i || '';
+          prop._quote = newQuote.q || '';
+          prop._author = newQuote.a || '';
         }
 
         return api;
@@ -218,7 +518,6 @@ console.log("C.");
       show: function () {
         this.quotes.show(this, this.category, this.language);
       },
-
 
     });
   </script>
