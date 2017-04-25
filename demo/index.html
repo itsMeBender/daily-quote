@@ -14,33 +14,63 @@
     <link rel="import" href="../daily-quote.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
-    </style>
-    <script>
-      function newRandomQuote () {
-        document.querySelector("#randomQuote").show();
+      .demo {
+        max-width: 740px;
       }
-    </script>
+      paper-button {
+        margin-top: 1.6em;
+      }
+    </style>
   </head>
-  <body>
-    <div class="vertical-section-container centered">
-      <h3>Randon quote from the available list.</h3>
+  <body onload="showTags()">
+    <div class="vertical-section-container centered demo">
+      <h3>A random quote from the available list.</h3>
+      <p>Using the English 'EN' library.</p>
       <demo-snippet>
         <template>
-          <daily-quote id="randomQuote"></daily-quote> 
+          <daily-quote id="randomQuote" language="EN"></daily-quote> 
           <paper-button onClick="newRandomQuote()" raised>New quote</paper-button>
         </template>
       </demo-snippet>
     </div>
 
-    <div class="vertical-section-container centered">
-      <h3>Using filters</h3>
-      <p>Choose a <em>language</em> and, or a <em>category</em>.</p>
+    <div class="vertical-section-container centered demo">
+      <h3>Using a tag</h3>
+      <p id="listTags"><em>Tag</em> like 'funny'.</p>
       <demo-snippet>
         <template>
-          <daily-quote language="EN" category="it"></daily-quote>
+          <daily-quote tag="computer"></daily-quote>
         </template>
       </demo-snippet>
     </div>
+
+    <div class="vertical-section-container centered demo">
+      <h3>Using attribute tag to seach in quote data</h3>
+      <p>Use a <em>word</em> as tag, like 'myth'.</p>
+      <demo-snippet>
+        <template>
+          <daily-quote tag="myth"></daily-quote>
+        </template>
+      </demo-snippet>
+    </div>
+
+    <script>
+      function showTags () {
+        var tags = document.querySelector("#randomQuote");
+        if (tags && tags.quotes) {
+          document.querySelector("#listTags").innerHTML = "<em>Tags</em>: " + tags.quotes.tagList().toString();
+        } else {
+          setTimeout(showTags, 10);
+        }
+      }
+      // Start polling when Polymer element is ready for duty
+      // I do not believe this is THE solution.
+      setTimeout(showTags, 10);
+
+      function newRandomQuote () {
+        document.querySelector("#randomQuote").show();
+      }
+    </script>
 
   </body>
 </html>
