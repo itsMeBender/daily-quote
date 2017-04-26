@@ -20,12 +20,33 @@
       paper-button {
         margin-top: 1.6em;
       }
+
+      .quote--mixin {
+        --quote-intro-theme: {
+          font-style: italic;
+          color: #666666;
+        }
+        --quote-theme: {
+          color: #436BA8;
+          padding-left: 1em;
+        }
+        --quote-author-theme: {
+          text-align: left;
+          font-style: normal;
+        }
+        --quote-theme--before: {
+          color: #CCCCCC;
+          content: '"';
+          font-size: 2em;
+          padding: 1em 0.2em 0 0;
+        }        
+      }
     </style>
   </head>
   <body onload="showTags()">
     <div class="vertical-section-container centered demo">
       <h3>A random quote from the available list.</h3>
-      <p>Using the English 'EN' library.</p>
+      <p>Using the English 'EN' library. Providing a button to change to quote. Using the show() method.</p>
       <demo-snippet>
         <template>
           <daily-quote id="randomQuote" language="EN"></daily-quote> 
@@ -46,10 +67,11 @@
 
     <div class="vertical-section-container centered demo">
       <h3>Using attribute tag to seach in quote data</h3>
-      <p>Use a <em>word</em> as tag, like 'myth'.</p>
+      <p>Use a <em>word</em> as tag, like 'myth'. Used to seach through the quote list.<br>
+      Use <em>mixins</em> to style the outcome.</p>
       <demo-snippet>
         <template>
-          <daily-quote tag="myth"></daily-quote>
+          <daily-quote tag="myth" class="quote--mixin"></daily-quote>
         </template>
       </demo-snippet>
     </div>
