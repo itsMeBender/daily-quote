@@ -2,7 +2,7 @@
 
 <!--
 ```
-<custom-element-demo>
+<custom-element-demo height="200">
   <template>
     <link rel="import" href="daily-quote.html">
     <next-code-block>
