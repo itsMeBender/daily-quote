@@ -36,23 +36,28 @@
 
 
         test('B01 : Method quotes.count() ', function() {
-          expect(element.quotes.count()).to.be.equal(6);
+          // Bad test, outcome changes when QUOTE database is mutated
+          expect(element.quotes.count()).to.be.equal(271);
         });
         
         test('B02 : Method quotes.languageCount() ', function() {
+          // Bad test, outcome changes when QUOTE database is mutated
           expect(element.quotes.languageCount()).to.be.equal(2);
         });
 
-        test('B03 : Method quotes.categoryCount() ', function() {
-          expect(element.quotes.categoryCount()).to.be.equal(3);
+        test('B03 : Method quotes.tagCount() ', function() {
+          // Bad test, outcome changes when QUOTE database is mutated
+          expect(element.quotes.tagCount()).to.be.equal(5);
         });
 
-        test('B04 : Method quotes.languages() ', function() {
-          expect(element.quotes.languages().toString()).to.be.equal("EN,NL");
+        test('B04 : Method quotes.languageList() ', function() {
+          // Bad test, outcome changes when QUOTE database is mutated
+          expect(element.quotes.languageList().toString()).to.be.equal("EN,NL");
         });
 
-        test('B05 : Method quotes.categories() ', function() {
-          expect(element.quotes.categories().toString()).to.be.equal("it,funny,life");
+        test('B05 : Method quotes.tagList() ', function() {
+          // Bad test, outcome changes when QUOTE database is mutated
+          expect(element.quotes.tagList().toString()).to.be.equal("computer,office,life,science,funny");
         });
 
         
