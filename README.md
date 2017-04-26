@@ -1,6 +1,6 @@
 # A daily quote ...
 
-<!--
+
 ```
 <custom-element-demo>
   <template>
@@ -9,7 +9,7 @@
   </template>
 </custom-element-demo>
 ```
--->
+
 ```html
 <daily-quote language="EN"></daily-quote>
 ```
