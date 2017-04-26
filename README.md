@@ -1,12 +1,15 @@
 # A daily quote ...
 
-<!--
-<custom-element-demo height="200">
+<!---
+```
+<custom-element-demo>
   <template>
+    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="import" href="daily-quote.html">
     <next-code-block></next-code-block>
   </template>
 </custom-element-demo>
+```
 -->
 ```html
 <daily-quote language="EN"></daily-quote>
