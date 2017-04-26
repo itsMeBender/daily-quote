@@ -5,7 +5,7 @@
 <custom-element-demo>
   <template>
     <link rel="import" href="daily-quote.html">
-    <next-code-block></next-code-block>
+    <daily-quote language="EN"></daily-quote>
   </template>
 </custom-element-demo>
 ```
@@ -20,12 +20,6 @@ I decided to use my own set of quotes because of then language I use.
 
 For me it's a nice project to sharpen my skills in; CSS3, Javascript, units tests, Polymer, Web Components and Raspberry Pi projects.  
 Because this quote of the day is used in my Magic Mirror project.
-
-# Usage
-
-    <daily-quote tag="einstein"></daily-quote>
-
-To get a quote from Albert Einstein.
 
 ## Inner workings
 
