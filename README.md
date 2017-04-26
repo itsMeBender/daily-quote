@@ -1,14 +1,17 @@
 # A daily quote ...
 
 <!--
-```
-<custom-element-demo height="200px" style="height:200px;">
+
+<custom-element-demo height="200">
   <template>
     <link rel="import" href="daily-quote.html">
     <daily-quote language="EN"></daily-quote>
+    <next-code-block>
+    <daily-quote language="EN"></daily-quote>
+    </next-code-block>
   </template>
 </custom-element-demo>
-```
+
 -->
 ```html
 <daily-quote language="EN"></daily-quote>
