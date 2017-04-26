@@ -1,8 +1,25 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-`daily-quote`
-Display a random quote
+With `daily-quote`, you display a random quote.
+
+```
+<daily-quote tag="einstein"></daily-quote>
+```
+
+Quote structure, if applicable;
+
+> Quote __introduction__  
+> __Quote__  
+> __Author__ of the quote  
+
+### Styling using mixins
+
+Mixin                  | Description         | Default
+-----------------------|---------------------|---------------------------
+`--quote-intro-theme`  | Quote introduction  | block; font:1.2em;
+`--quote-theme`        | Quote               | block; font:1.8em; margin;
+`--quote-author-theme` | Author of the quote | block; right; font:1.2em; italic; margin-right
 
 @demo demo/index.html 
 -->
@@ -15,12 +32,17 @@ Display a random quote
       }
       .q--intro {
         display: block;
-        font-size: 1.2em;        
+        font-size: 1.2em;
+        @apply --quote-intro-theme;
       }
       .q--quote {
         display: block;
         font-size: 1.8em;
         margin: 0.4em 0 0.6em 0em;
+        @apply --quote-theme;
+      }
+      .q--quote:before {
+        @apply --quote-theme--before;
       }
       .q--author {
         display: block;
@@ -28,6 +50,7 @@ Display a random quote
         font-style: italic;
         font-size: 1.2em;
         margin-right: 4em;
+        @apply --quote-author-theme;
       }
     </style>
     <div> 
@@ -48,8 +71,8 @@ Display a random quote
     Polymer({
 
       // True when there is content to show.
-      _hasContent: function (text) {
-        if (text && text != '') {
+      _hasContent: function (content) {
+        if (content && content != '') {
           return true;
         }
         return false;
@@ -57,9 +80,9 @@ Display a random quote
 
       is: 'daily-quote',
 
-      // Call quotes.show(language, category) whem properties are changed
+      // Call quotes.show(tag, language) when attributes/properties are changed
       observers: [
-        'show(language, category)',
+        'show(tag, language)',
       ],
 
       properties: {
@@ -82,16 +105,16 @@ Display a random quote
           value: '',
         },
 
-        // The quote category, like 'funny' category
-        category: {
+        // The quote tag, like 'funny' tag
+        tag: {
           type: String,
-          value: '',   // Stands for ALL categories
+          value: '',   // Stands for ALL tags
         },
 
         // Language of the presented quote. Default 'EN'.
         language: {
           type: String,
-          value: '',    // Stands for all languages
+          value: 'EN',    // Stands for all languages
         },
 
       },
@@ -100,21 +123,21 @@ Display a random quote
       quotes: (function () {
         var api = {};     // External API for quotes
         var languages;    // Which languages are provided with quotes
-        var categories;   // Categories for quotes
+        var quoteTags;    // Tags for quotes
 
         // l:Language, q:Quote, a:Author, c:Catagory (one)
         var quotes = [
           {l:'EN', q:"Life is hard and then you die!"},
           {l:'EN', q:"The disbelievers say! 'HO!', this is a mere wizard.", a:"Quran, Surak"},
           {l:'EN', q:"Death is life's away of telling you've been fired."},
-          {l:'EN', q:"CPU time flies when you have a lot of bugs.", c:"computer"},
+          {l:'EN', q:"CPU time flies when you have a lot of bugs.", t:"computer"},
           {l:'EN', q:"It is hard to make the world go away when it has decided to notice you.", a:"Spock's World"},
           {l:'EN', q:"Question authority and the authorities will question you."},
           {l:'EN', q:"I don't ever remember forgetting anything.", a:"Chris Rende"},
           {l:'EN', q:"All of us is smarter than each of us."},
           {l:'EN', q:"Of all the things I've lost, i miss my mind the most."},
-          {l:'EN', q:"MIPS : Meaningless Information about Processor Speed.", c:"computer"},
-          {l:'EN', q:"To ERROR is human!", c:"computer"},
+          {l:'EN', q:"MIPS : Meaningless Information about Processor Speed.", t:"computer"},
+          {l:'EN', q:"To ERROR is human!", t:"computer"},
           {l:'EN', q:"The man who falls in a vat of molten glass, makes a spectacle from himself."},
           {l:'EN', q:"You may think you're smart, but you're STUPID! But, you've met your match in ME!", a:"Col. Pierce"},
           {l:'EN', q:"Nobody knows what I'm saying, I don't even know what I'm saying."},
@@ -128,7 +151,7 @@ Display a random quote
           {l:'EN', q:"Studying is the only way to do nothing without anyone blaming you.", a:"m. Teitinen, Student of Computer Science."},
           {l:'EN', q:"All stessed out and nobody to choke."},
           {l:'EN', q:"NO this mind is not for rent, to any god or gouverment.", a:"Rush."},
-          {l:'EN', q:"Our policy is to always blame the computer.", c:"computer"},
+          {l:'EN', q:"Our policy is to always blame the computer.", t:"computer"},
           {l:'EN', q:"Nature sides with the hidden flaw."},
           {l:'EN', i:"Ralph's Observation", q:"It is a mistake to allow any mechanical object to realize that you are in a hurry."},
           {l:'EN', i:"Cole's Law", q:"Thinly sliced cabbage."},
@@ -136,10 +159,10 @@ Display a random quote
           {l:'EN', i:"Firestone's Law of Forcasting", q:"Chicken Little only has to be right once."},
           {l:'EN', i:"Manly's Maxim", q:"Logic is a systematic method of coming to the wrong conclusion with confidence."},
           {l:'EN', i:"Moer's truism", q:"The trouble with most jobs is the job holder's resemblence to being one of a sled dog team. No one gets a change of scenery except the lead dog."},
-          {l:'EN', i:"Cannon's Comment", q:"If you tell the boss you were late for work because you had a flat tire, the next morning you will have a flat tire.", c:"office"},
-          {l:'EN', i:"Murphy's law", q:"If anything can go wrong, it will.", c:"life"},
-          {l:'EN', i:"Murphy's Corollary", q:"Left to themselves, things tend to go from bad to worse.", c:"science"},
-          {l:'EN', i:"Murphy's Corollary", q:"It is impossible to make anything foolproof because fools are so ingenious", c:"science"},
+          {l:'EN', i:"Cannon's Comment", q:"If you tell the boss you were late for work because you had a flat tire, the next morning you will have a flat tire.", t:"office"},
+          {l:'EN', i:"Murphy's law", q:"If anything can go wrong, it will.", t:"life"},
+          {l:'EN', i:"Murphy's Corollary", q:"Left to themselves, things tend to go from bad to worse.", t:"science"},
+          {l:'EN', i:"Murphy's Corollary", q:"It is impossible to make anything foolproof because fools are so ingenious", t:"science"},
           {l:'EN', i:"Murphy's Constant", q:"Matter will be damaged in direct proportion to its value"},
           {l:'EN', i:"Quantized Revision of Murphy's Law", q:"Everything goes wrong all at once."},
           {l:'EN', i:"O'Toole's Commentary", q:"Murphy was an optimist."},
@@ -167,18 +190,18 @@ Display a random quote
           {l:'EN', i:"First Law of Revision", q:"Information necessitiating a change of design will be conveyed to the designer after - and only after - the plans are complete. (Often called the 'Now They Tell Us' Law)"},
           {l:'EN', i:"Second Law of Revision", q:"The more innocuous the modification appears to be, the further its influence will extend and the more plans will have to be redrawn."},
           {l:'EN', i:"Corollary to the First Law of Revision", q:"In simple cases, presenting one obvious right way versus one obvious wrong way, it is often wiser to choose the wrong way, so as to expedite subsequent revision."},
-          {l:'EN', i:"Laws of computer programming: I.", q:"Any given program, when running, is obsolete.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: II.", q:"Any given program costs more and takes longer.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: III.", q:"If a program is useful, it will have to be changed.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: IV.", q:"If a program is useless, it will have to be documented.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: V.", q:"Any program will expand to fill available memory.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: VI.", q:"The value of a program is proportional to the weight of its output.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: VII.", q:"Program complexity grows until it exceeds the capabilities of the programmer who must maintain it.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: VIII.", q:"Any non-trivial program contains at least one bug.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: IX.", q:"Undetectable errors are infinite in variety, in contrast to detectable errors, which by definition are limited.", c:"computer"},
-          {l:'EN', i:"Laws of computer programming: X.", q:"Adding manpower to a late software project makes it later.", c:"computer"},
-          {l:'EN', i:"Lubarsky's Law of Cybernetic Entomology", q:"There's always one more bug.", c:"computer"},
-          {l:'EN', i:"Shaw's Principle", q:"Build a system that even a fool can use, and only a fool will want to use it.", c:"computer"},
+          {l:'EN', i:"Laws of computer programming: I.", q:"Any given program, when running, is obsolete.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: II.", q:"Any given program costs more and takes longer.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: III.", q:"If a program is useful, it will have to be changed.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: IV.", q:"If a program is useless, it will have to be documented.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: V.", q:"Any program will expand to fill available memory.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: VI.", q:"The value of a program is proportional to the weight of its output.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: VII.", q:"Program complexity grows until it exceeds the capabilities of the programmer who must maintain it.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: VIII.", q:"Any non-trivial program contains at least one bug.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: IX.", q:"Undetectable errors are infinite in variety, in contrast to detectable errors, which by definition are limited.", t:"computer"},
+          {l:'EN', i:"Laws of computer programming: X.", q:"Adding manpower to a late software project makes it later.", t:"computer"},
+          {l:'EN', i:"Lubarsky's Law of Cybernetic Entomology", q:"There's always one more bug.", t:"computer"},
+          {l:'EN', i:"Shaw's Principle", q:"Build a system that even a fool can use, and only a fool will want to use it.", t:"computer"},
           {l:'EN', i:"Law of the Perversity of Nature", q:"You cannot successfully determine beforehand which side of the bread to butter."},
           {l:'EN', i:"Law of Selective Gravity", q:"An object will fall so as to do the most damage."},
           {l:'EN', i:"Jennings Corollary to the Law of Selective Gravity", q:"The chance of the bread falling with the butter side down is directly proportional to the value of the carpet."},
@@ -213,7 +236,7 @@ Display a random quote
           {l:'EN', i:"Wyszowski's Law", q:"No experiment is reproducible."},
           {l:'EN', i:"Fett's Law", q:"Never replicate a successful experiment."},
           {l:'EN', i:"Brooke's Law", q:"Whenever a system becomes completely defined, some damn fool discovers something which either abolishes the system or expands it beyond recognition."},
-          {l:'EN', i:"The first Myth of Management", q:"It exists."},
+          {l:'EN', i:"The first Myth of Management", q:"It exists.", a:"a Manager"},
           {l:'EN', q:"Spend sufficient time confirming the need and the need will disappear."},
           {l:'EN', i:"Peter's Placebo", q:"An ounce of image is worth a pound of performance."},
           {l:'EN', i:"Zymurgy's Law of Volunteer Labour", q:"People are always available for work in the past tense."},
@@ -239,7 +262,7 @@ Display a random quote
           {l:'EN', i:"Lynch's Law", q:"When the going gets tough, everybody leaves."},
           {l:'EN', i:"Law of Revelation", q:"The hidden flaw never remains hidden."},
           {l:'EN', i:"Langsam's Law", q:"Everything depends."},
-          {l:'EN', i:"Hellrung's Law", q:"If you wait, it will go away.  Shevelson's Extension: ... having done its damage.  Grelb's Addition: ... if it was bad, it will be back."},
+          {l:'EN', i:"Hellrung's Law", q:"If you wait, it will go away. Shevelson's Extension: ... having done its damage.  Grelb's Addition: ... if it was bad, it will be back."},
           {l:'EN', i:"Grossman's Misquote", q:"Complex problems have simple, easy to understand wrong answers."},
           {l:'EN', i:"Ducharme's Precept", q:"Opportunity always knocks at the least opportune moment."},
           {l:'EN', i:"First Postulate of Isomurphism", q:"Things equal to nothing else are equal to each other."},
@@ -251,7 +274,7 @@ Display a random quote
           {l:'EN', i:"Stewart's Law of Retroaction", q:"It is easier to get forgiveness than permission."},
           {l:'EN', i:"MacDonald's Second Law", q:"Consultants are mystical people who ask a company for a number and give it back to them."},
           {l:'EN', i:"First Law of Laboratory Work", q:"Hot glass looks exactly the same as cold glass."},
-          {l:'EN', i:"Handy Guide to Modern Science", q:"1.  If it's green or it wiggles, it's biology. 2.  If it stinks, it's chemistry. 3.  If it doesn't work, it's physics."},
+          {l:'EN', i:"Handy Guide to Modern Science", q:"1. If it's green or it wiggles, it's biology. 2. If it stinks, it's chemistry. 3. If it doesn't work, it's physics."},
           {l:'EN', q:"To err is human, but to really foul things up requires a computer."},
           {l:'EN', i:"The Sausage Principle", q:"People who love sausage and respect the law should never watch either one being made."},
           {l:'EN', i:"Horngren's Observation", q:"(generalized) The real world is a special case."},
@@ -314,31 +337,33 @@ Display a random quote
           {l:'EN', q:"Adultary is the application of democracy to love.", a:"H. L. Menchen"},
           {l:'EN', i:"The Arithmetic of Cooperation", q:"When you're adding up committees there's a useful rule of thumb: that talents make a difference, and follies make a sum.", a:"Piet Hein"},
           {l:'EN', q:"The Ultimate Wisdom Philosophers must ultimately find their true perfection in knowing all the follies of mankind by introspection.", a:"Piet Hein"},
-          {l:'EN', i:"Murphy's Military Laws", q:"1. Never share a foxhole with anyone braver than you are."},
-          {l:'EN', i:"Murphy's Military Laws", q:"2. No battle plan ever survives contact with the enemy."},
-          {l:'EN', i:"Murphy's Military Laws", q:"3. Friendly fire ain't."},
-          {l:'EN', i:"Murphy's Military Laws", q:"4. The most dangerous thing in the combat zone   is an officer with a map."},
-          {l:'EN', i:"Murphy's Military Laws", q:"5. The problem with taking the easy way out is   that the enemy has already mined it."},
-          {l:'EN', i:"Murphy's Military Laws", q:"6. The buddy system is essential to your survival;   it gives the enemy somebody else to shoot at."},
-          {l:'EN', i:"Murphy's Military Laws", q:"7. The further you are in advance of your own positions,   the more likely your artillery will shoot short."},
-          {l:'EN', i:"Murphy's Military Laws", q:"8. Incoming fire has the right of way."},
-          {l:'EN', i:"Murphy's Military Laws", q:"9. If your advance is going well, you are walking into an ambush."},
-          {l:'EN', i:"Murphy's Military Laws", q:"10. The quartermaster has only two sizes, too large and too small."},
-          {l:'EN', i:"Murphy's Military Laws", q:"11. If you really need an officer in a hurry, take a nap."},
-          {l:'EN', i:"Murphy's Military Laws", q:"12. The only time suppressive fire works is when it is used   on abandoned positions."},
-          {l:'EN', i:"Murphy's Military Laws", q:"13. The only thing more accurate than incoming enemy fire   is incoming friendly fire."},
-          {l:'EN', i:"Murphy's Military Laws", q:"14. There is nothing more satisfying that having someone take   a shot at you, and miss."},
-          {l:'EN', i:"Murphy's Military Laws", q:"15. Don't be conspicuous. In the combat zone, it draws fire. Out of the combat zone, it draws sergeants."},
-          {l:'EN', i:"Murphy's Military Laws", q:"16. If your sergeant can see you, so can the enemy."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#1. Never share a foxhole with anyone braver than you are."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#2. No battle plan ever survives contact with the enemy."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#3. Friendly fire ain't."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#4. The most dangerous thing in the combat zone is an officer with a map."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#5. The problem with taking the easy way out is that the enemy has already mined it."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#6. The buddy system is essential to your survival; it gives the enemy somebody else to shoot at."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#7. The further you are in advance of your own positions, the more likely your artillery will shoot short."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#8. Incoming fire has the right of way."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#9. If your advance is going well, you are walking into an ambush."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#10. The quartermaster has only two sizes, too large and too small."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#11. If you really need an officer in a hurry, take a nap."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#12. The only time suppressive fire works is when it is used on abandoned positions."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#13. The only thing more accurate than incoming enemy fire is incoming friendly fire."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#14. There is nothing more satisfying that having someone take a shot at you, and miss."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#15. Don't be conspicuous. In the combat zone, it draws fire. Out of the combat zone, it draws sergeants."},
+          {l:'EN', i:"Murphy's Military Laws", q:"#16. If your sergeant can see you, so can the enemy."},
           {l:'EN', i:"Conrad's Conundrum", q:"Technology don't transfer."},
           {l:'EN', q:"Blessed are the young, for they shall inherit the national debt.", a:"Herbert Hoover"},
           {l:'EN', q:"Nature sides with the hidden flaw."},
-          {l:'NL', q:"Mijn auto leeft: Hij rookt, hij zuipt en hij wipt.", c:"funny"},
-          {l:'NL', q:"In wereld oorlog IV vechten we met knotsen.", a:"Albert Einstein", c:"life"},
+          {l:'EN', q:"Success is not final, failure is not fatal: it is the courage to continue that counts.", a:"Winston Churchill"},
+
+          {l:'NL', q:"Mijn auto leeft: Hij rookt, hij zuipt en hij wipt.", t:"funny"},
+          {l:'NL', q:"In wereld oorlog IV vechten we met knotsen.", a:"Albert Einstein", t:"life"},
           {l:'NL', q:"Einstein was zo geniaal dat er maar 10 mensen op de wereld hem begrijpen, mij begrijpt niemand."},
-          {l:'NL', q:"Het is makkelijker een onduidelijk programma te schrijven, dan een duidelijk programma te begrijpen.", c:"computer"},
-          {l:'NL', q:"Geboren worden is gratis, dood gaan is gratis... Alleen tussen door even geld lenen.", c:"life"},
-          {l:'NL', q:"De ultieme 'Hacker' communiceert direct met de machine, zonder gestoord te worden door een interface.", c:"computer"},
+          {l:'NL', q:"Het is makkelijker een onduidelijk programma te schrijven, dan een duidelijk programma te begrijpen.", t:"computer"},
+          {l:'NL', q:"Geboren worden is gratis, dood gaan is gratis... Alleen tussen door even geld lenen.", t:"life"},
+          {l:'NL', q:"De ultieme 'Hacker' communiceert direct met de machine, zonder gestoord te worden door een interface.", t:"computer"},
           {l:'NL', q:"Een nietmachine niet, een naaimachine niet!"},
           {l:'NL', q:"Ik ben van morgen met mijn goede been uit het verkeerde bed gestapt."},
           {l:'NL', q:"Murphy: Een schone das trekt de soep van de dag aan."},
@@ -352,7 +377,7 @@ Display a random quote
           {l:'NL', q:"Een dokter kan zijn fouten begraven, maar een architect kan z'n client alleen adviseren een klimop te planten."},
           {l:'NL', i:"De wetten van de fotograaf", q:"De mooiste opnamen doen zich voor nadat de memory stick vol staat."},
           {l:'NL', q:"Je vindt iets altijd op de laatste plaats waar je zoekt. Je kunt altijd alles vinden wat je niet zoekt"},
-          {l:'NL', q:"Vloeken is die ene taal die alle programmeurs uitstekend beheersen.", c:"computer"},
+          {l:'NL', q:"Vloeken is die ene taal die alle programmeurs uitstekend beheersen.", t:"computer"},
           {l:'NL', q:"Heet glas ziet er precies hetzelfde uit als koud glas."},
           {l:'NL', q:"Een expert is iemand die meer en meer weet over minder en minder, totdat ze absoluut alles weten over niets."},
           {l:'NL', i:"De bibliotheek wet", q:"Als het goed begint, loopt het slecht af.... Als het slecht begint, loopt het nog slechter af."},
@@ -377,33 +402,33 @@ Display a random quote
         ];
         var filteredQuotes = [];
         var filterAppliedLanguage;
-        var filterAppliedCategory;
+        var filterAppliedTag;
 
         /**
-         * Filter for optional quote categories. Only one category expected!
-         * @return {array} of categories
+         * Scan for optional quote tags. Only one tag expected per quote!
+         * @return {array} of tags
          */
-        function filterCategory () {
-          // Return value if already filtered.
-          if (categories) {
-            return categories;
+        function scanTags () {
+          // Return value if already scanned.
+          if (quoteTags) {
+            return quoteTags;
           }
-          categories = [];
+          quoteTags = [];
           quotes.forEach(function (quote) {
-            if (quote.c) {
-              if (categories.indexOf(quote.c) === -1) {
-                categories.push(quote.c);
+            if (quote.t) {
+              if (quoteTags.indexOf(quote.t) === -1) {
+                quoteTags.push(quote.t);
               }
             }
           });
-          return categories;
+          return quoteTags;
         }
 
         /**
          * Filter for unique mandatory language ID's
          * @return {array} of language ID's
          */
-        function filterLanguages () {
+        function scanLanguages () {
           // Return value if already filtered.
           if (languages) {
             return languages;
@@ -417,39 +442,50 @@ Display a random quote
           return languages;
         }
 
-        function filterQuotes (category, language) {
+        function filterQuotes (tag, language) {
+          var str;
 
           language = language.toUpperCase();
 
-          if (filterAppliedCategory !== category || filterAppliedLanguage !== language) {
-            filteredQuotes = [];
-
+          if (filterAppliedTag !== tag || filterAppliedLanguage !== language) {
             // One of the filters has been changed, filter again on new parameters.
-            filterAppliedCategory = category;
+            filteredQuotes = [];
+            filterAppliedTag = tag;
             filterAppliedLanguage = language;
 
-            if (category === '' && language === '') {
+            if (filterAppliedTag === '' && filterAppliedLanguage === '') {
               // No filter used, so all quotes are VALID
               quotes.forEach( function (quote, idx) {
+                // Storing only the INDEX to the quote, to save memory
                 filteredQuotes.push(idx);
               });
 
-            } else if (category && language === '') {
-              quotes.forEach( function (quote, idx) {
-                if ((quote.c && quote.c.indexOf(filterAppliedCategory) >= 0)) {
-                  filteredQuotes.push(idx);                
-                }
-              });
-            } else if (category === '' && language) {
+            } else if (filterAppliedTag === '' && filterAppliedLanguage) {
+              // Only filter on language
               quotes.forEach( function (quote, idx) {
                 if ((quote.l && quote.l === filterAppliedLanguage)) {
                   filteredQuotes.push(idx);                
                 }
               });
+
             } else {
+              // Filter on LANGUAGE and or TAGs.
               quotes.forEach( function (quote, idx) {
-                if ((quote.c && quote.c.indexOf(filterAppliedCategory) >= 0) && (quote.l && quote.l === filterAppliedLanguage)) {
-                  filteredQuotes.push(idx);                
+                // I'll include free text search also, allowing to search in the quotes.
+                str = '';
+                str += quote.t || '';
+                str += quote.q || '';
+                str += quote.a || '';
+                str += quote.i || '';
+
+                if (filterAppliedLanguage) {
+                  if ((str.toLowerCase().indexOf(filterAppliedTag.toLowerCase()) >= 0) && (quote.l && quote.l === filterAppliedLanguage)) {
+                    filteredQuotes.push(idx);                
+                  }
+                } else {
+                  if (str.toLowerCase().indexOf(filterAppliedTag.toLowerCase()) >= 0) {
+                    filteredQuotes.push(idx);                
+                  }
                 }
               });
             }
@@ -461,51 +497,45 @@ Display a random quote
          * @param {Number} idx of the quote list
          * @return {Object} quote
          */
-        function pickOne (category, language) {
-          filterQuotes(category, language);
+        function pickOne (tag, language) {
+          filterQuotes(tag, language);
           return quotes[filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)]];
         }
 
-        api.categories = function () {
-          return categories || filterCategory();
+        api.tagList = function () {
+          return quoteTags || scanTags();
         };
 
-        api.categoryCount = function () {
-          categories = categories || filterCategory();
-          return categories.length;
+        api.tagCount = function () {
+          quoteTags = quoteTags || scanTags();
+          return quoteTags.length;
         };
 
         api.count = function () {
           return quotes.length;
         };
 
-        api.languages = function () {
-          return languages || filterLanguages();
+        api.languageList = function () {
+          return languages || scanLanguages();
         };
 
         api.languageCount = function () {
-          languages = languages || filterLanguages();
+          languages = languages || scanLanguages();
           return languages.length;
         };
 
         /**
-         * Generate new quote, based on language and category
+         * Generate new quote, based on language and tag
          */
-        api.show = function (prop, category, language) {
+        api.show = function (prop, tag, language) {
           var newQuote;
           // Sanitize check
-          if (language && this.languages().toString().indexOf(language) === -1) {
+          if (language && this.languageList().toString().indexOf(language) === -1) {
             this._quote = "No quotes available for language '" + language + "'.";
             return;
           }
 
-          // Sanitize check
-          if (category && this.categories().toString().indexOf(category) === -1) {
-            this._quote = "No quotes available for category '" + category + "'.";
-            return;
-          }
-
-          newQuote = pickOne(category, language);    
+          newQuote = pickOne(tag, language);    
           prop._intro = newQuote.i || '';
           prop._quote = newQuote.q || '';
           prop._author = newQuote.a || '';
@@ -514,9 +544,15 @@ Display a random quote
         return api;
       })(),
 
-      // To show a new quote.
-      show: function () {
-        this.quotes.show(this, this.category, this.language);
+      /**
+       * To show a new quote.
+       * @param {String} tag to scan for.
+       * @param {String} language of the quote. Empty is all languages.
+       */
+      show: function (tag, language) {
+        tag = tag || this.tag;
+        language = language || this.language;
+        this.quotes.show(this, tag, language);
       },
 
     });
