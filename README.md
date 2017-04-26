@@ -2,12 +2,10 @@
 
 <!--
 ```
-<custom-element-demo height="200">
+<custom-element-demo height="200px" style="height:200px;">
   <template>
     <link rel="import" href="daily-quote.html">
-    <next-code-block>
-        <daily-quote language="EN"></daily-quote>
-    </next-code-block>
+    <daily-quote language="EN"></daily-quote>
   </template>
 </custom-element-demo>
 ```
