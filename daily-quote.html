@@ -498,8 +498,13 @@ Mixin                  | Description         | Default
          * @return {Object} quote
          */
         function pickOne (tag, language) {
-          filterQuotes(tag, language);
-          return quotes[filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)]];
+          filterQuotes(tag, language);  // Set global 'filteredQuotes'.
+
+          if (filteredQuotes.length) {
+            return quotes[filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)]];
+          } else {
+            return {l:'EN', q:"No quote found for combination, tag '" + tag + "' and or language '" + language + "'."};
+          }
         }
 
         api.tagList = function () {
@@ -529,13 +534,14 @@ Mixin                  | Description         | Default
          */
         api.show = function (prop, tag, language) {
           var newQuote;
+
           // Sanitize check
           if (language && this.languageList().toString().indexOf(language) === -1) {
-            this._quote = "No quotes available for language '" + language + "'.";
-            return;
+            newQuote = {l:'EN', q:"No quote available for language '" + language + "'."};
+          } else {
+            newQuote = pickOne(tag, language);
           }
 
-          newQuote = pickOne(tag, language);    
           prop._intro = newQuote.i || '';
           prop._quote = newQuote.q || '';
           prop._author = newQuote.a || '';

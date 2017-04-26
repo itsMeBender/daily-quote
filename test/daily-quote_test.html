@@ -60,7 +60,26 @@
           expect(element.quotes.tagList().toString()).to.be.equal("computer,office,life,science,funny");
         });
 
-        
+
+
+        test('C01 : Response to unknown search tag', function(done) {
+          element.show('tagDoesNotExist', 'EN');
+          // Give <daily-quote>.show(), some time to do it's thing. Putting test on the stack.
+          setTimeout(function () {
+            expect(element.$$(".q--quote").innerHTML).to.be.equal("No quote found for combination, tag 'tagDoesNotExist' and or language 'EN'.");
+            done();
+          }, 10);
+        });
+
+        test('C02 : Response to unknown language', function(done) {
+          element.show('computer', 'XX');
+          // Give <daily-quote>.show(), some time to do it's thing. Putting test on the stack.
+          setTimeout(function () {
+            expect(element.$$(".q--quote").innerHTML).to.be.equal("No quote available for language 'XX'.");
+            done();
+          }, 10);
+        });
+
       });
     </script>
   </body>
