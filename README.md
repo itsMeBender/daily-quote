@@ -1,5 +1,19 @@
 # A daily quote ...
 
+<!--
+```
+<custom-element-demo>
+  <template>
+    <link rel="import" href="daily-quote.html">
+    <next-code-block></next-code-block>
+  </template>
+</custom-element-demo>
+```
+-->
+```html
+<daily-quote language="EN"></daily-quote>
+```
+
 This element generates a quote of the day. You can get inspiration form this website [BrainyQuote](https://www.brainyquote.com/).  
 
 I decided to use my own set of quotes because of then language I use.
@@ -15,5 +29,5 @@ To get a quote from Albert Einstein.
 
 ## Inner workings
 
-All quotes are bundled inside this element. You can add, change the quotes in the code.
+All quotes are bundled inside this element. You can add, change, delete the quotes in the code.
 
