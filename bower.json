@@ -2,7 +2,7 @@
   "name": "daily-quote",
   "description": "Display a random quote",
   "main": "daily-quote.html",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0"
   },
