@@ -7,19 +7,32 @@ With `daily-quote`, you display a random quote.
 <daily-quote tag="einstein"></daily-quote>
 ```
 
-Quote structure, if applicable;
+Quote layout, if applicable;
 
 > Quote __introduction__  
-> __Quote__  
+> __Quote__, with optional cite URI  
 > __Author__ of the quote  
 
 ### Styling using mixins
 
-Mixin                  | Description         | Default
------------------------|---------------------|---------------------------
-`--quote-intro-theme`  | Quote introduction  | block; font:1.2em;
-`--quote-theme`        | Quote               | font:1.8em;
-`--quote-author-theme` | Author of the quote | block; right; font:1.2em; italic; margin-right
+Mixin                   | Description         | Default
+------------------------|---------------------|---------------------------
+`--quote-intro-theme`   | Quote introduction  | block; font:1.2em;
+`--quote-theme`         | Quote               | font:1.8em;
+`--quote-theme--before` | Style BEFORE quote  | -
+`--quote-theme--after`  | Style AFTER quote   | -
+`--quote-author-theme`  | Author of the quote | block; right; font:1.2em; italic; margin-right
+
+### JSON quote structure, see code
+
+```js
+  var quotes = [{
+    l:'EN',                           // l:Language
+    q:"Quote text",                   // q:Quote text
+    a:'Who said it',                  // a:Author
+    t:'A single tag to group quotes', // t:Tag (expected one word)
+    c:"Citation URI"}, ... ]          // c:Cite (uri)
+```
 
 @demo demo/index.html 
 -->
@@ -56,7 +69,8 @@ Mixin                  | Description         | Default
     </style>
     <div> 
         <span class="q--intro" hidden$="{{_noIntro}}">[[_intro]]</span>
-        <blockquote>[[_quote]]</blockquote>
+        <blockquote hidden$="{{_hasCite}}">[[_quote]]</blockquote>
+        <blockquote hidden$="{{!_hasCite}}" cite="[[_cite]]">[[_quote]]</blockquote>
         <span class="q--author" hidden$="{{_noAuthor}}">[[_author]]</span>
     </div>
 
@@ -64,6 +78,15 @@ Mixin                  | Description         | Default
 
   <script>
     Polymer({
+
+      /**
+       * To show a specific quote by its unique index.
+       * Original intention to test Web Component
+       * @param {Number} idx of the quote
+       */
+      _showByIndex: function (idx) {
+        this.quotes.showByIndex(this, idx);
+      },
 
       is: 'daily-quote',
 
@@ -80,14 +103,20 @@ Mixin                  | Description         | Default
           value: '',
         },
 
-        // Quote definition, like 'Murphy`s law'
-        _intro: {
+        // Quote's citation
+        _cite: {
           type: String,
           value: '',
         },
 
-        // The quote
-        _quote: {
+        // Does the quote has a citation URI
+        _hasCite: {
+          type: Boolean,
+          value: false,          
+        },
+
+        // Quote definition, like 'Murphy`s law'
+        _intro: {
           type: String,
           value: '',
         },
@@ -102,6 +131,12 @@ Mixin                  | Description         | Default
         _noIntro: {
           type: Boolean,
           value: false,
+        },
+
+        // The quote
+        _quote: {
+          type: String,
+          value: '',
         },
 
         // The quote tag, like 'funny' tag
@@ -121,6 +156,9 @@ Mixin                  | Description         | Default
       // Object with quote data and methods to work with quotes
       quotes: (function () {
         var api = {};     // External API for quotes
+        var filteredQuotes = [];
+        var filterAppliedLanguage;
+        var filterAppliedTag;
         var languages;    // Which languages are provided with quotes
         var quoteTags;    // Tags for quotes
 
@@ -357,23 +395,23 @@ Mixin                  | Description         | Default
           {l:'EN', q:"Nature sides with the hidden flaw."},
           {l:'EN', q:"Success is not final, failure is not fatal: it is the courage to continue that counts.", a:"Winston Churchill"},
 
-          {l:'EN', q:"This is the worst kind of discrimination there is: the kind against me!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Hahahahaha. Oh wait you’re serious. Let me laugh even harder.", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"I’ll build by own theme park. With black jack, and hookers. In fact, forget the park!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"The game’s over. I have all the money. Compare your lives to mine and then kill yourselves!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"That’s closest thing to ‘Bender is great’ that anyone other me has ever said.", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"I’m Bender, baby! Oh god, please insert liquor!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Hey sexy mama, wanna kill all humans?", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"You know what cheers me up? Other people’s misfortune.", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Anything less than immortality is a complete waste of time.", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Blackmail is such an ugly word. I prefer extortion. The ‘x’ makes it sound cool.", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Oh, your God!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"You’re a pimple on society’s ass and you’ll never amount to anything!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Shut up baby, I know it!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"I’m so embarrassed. I wish everyone else was dead!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Afterlife? If I thought I had to live another life, I’d kill myself right now!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"I don't have emotions and sometimes that makes me very sad.", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
-          {l:'EN', q:"Bite my shiny metal ass!", t:"futurama", a:"Bender", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"This is the worst kind of discrimination there is: the kind against me!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Hahahahaha. Oh wait you’re serious. Let me laugh even harder.", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"I’ll build by own theme park. With black jack, and hookers. In fact, forget the park!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"The game’s over. I have all the money. Compare your lives to mine and then kill yourselves!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"That’s closest thing to ‘Bender is great’ that anyone other me has ever said.", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"I’m Bender, baby! Oh god, please insert liquor!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Hey sexy mama, wanna kill all humans?", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"You know what cheers me up? Other people’s misfortune.", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Anything less than immortality is a complete waste of time.", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Blackmail is such an ugly word. I prefer extortion. The ‘x’ makes it sound cool.", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Oh, your God!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"You’re a pimple on society’s ass and you’ll never amount to anything!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Shut up baby, I know it!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"I’m so embarrassed. I wish everyone else was dead!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Afterlife? If I thought I had to live another life, I’d kill myself right now!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"I don't have emotions and sometimes that makes me very sad.", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
+          {l:'EN', q:"Bite my shiny metal ass!", t:"futurama", a:"Bender, a bending robot", c:"http://futurama.wikia.com/wiki/List_of_Futurama_Websites"},
 
           {l:'NL', q:"Mijn auto leeft: Hij rookt, hij zuipt en hij wipt.", t:"funny"},
           {l:'NL', q:"In wereld oorlog IV vechten we met knotsen.", a:"Albert Einstein", t:"life"},
@@ -417,9 +455,6 @@ Mixin                  | Description         | Default
           {l:'NL', i:"De observatiewet", q:"Niets ziet er van veraf net zo goed uit als van dichtbij. Of: niets ziet er van dichtbij net zo goed uit als van veraf."},
           {l:'NL', q:"Een onzorgvuldig project duurt 3 maal zo lang als gepland, een zorgvuldig gepland project duurt slechts twee maal zo lang."},
         ];
-        var filteredQuotes = [];
-        var filterAppliedLanguage;
-        var filterAppliedTag;
 
         /**
          * Scan for optional quote tags. Only one tag expected per quote!
@@ -517,8 +552,9 @@ Mixin                  | Description         | Default
         }
 
         /**
-         * Pick quote by index
-         * @param {Number} idx of the quote list
+         * Pick a random quote, based on 'tag' and 'language'.
+         * @param {String} tag to search for
+         * @param {String} language to search for
          * @return {Object} quote
          */
         function pickOne (tag, language) {
@@ -531,23 +567,25 @@ Mixin                  | Description         | Default
           }
         }
 
-        api.tagList = function () {
-          return quoteTags || scanTags();
-        };
+        // API FUNCTIONS
 
-        api.tagCount = function () {
-          quoteTags = quoteTags || scanTags();
-          return quoteTags.length;
-        };
-
+        /**
+         * @return the number of quotes.
+         */
         api.count = function () {
           return quotes.length;
         };
 
+        /**
+         * @return an Array of available (registered) languages.
+         */
         api.languageList = function () {
           return languages || scanLanguages();
         };
 
+        /**
+         * @return the number of available (registered) languages.
+         */
         api.languageCount = function () {
           languages = languages || scanLanguages();
           return languages.length;
@@ -555,6 +593,10 @@ Mixin                  | Description         | Default
 
         /**
          * Generate new quote, based on language and tag
+         * @param {Element} prop, this web component element properties
+         * @param {String} tag to search for
+         * @param {String} language to search for
+         * Returns nothing, but invokes web component element properties
          */
         api.show = function (prop, tag, language) {
           var newQuote;
@@ -570,10 +612,53 @@ Mixin                  | Description         | Default
           prop._intro    = newQuote.i || '';
           prop._quote    = newQuote.q || '';   // Fact: a quote is always provided
           prop._author   = newQuote.a || '';
+          prop._cite     = newQuote.c || '';
 
           prop._noIntro  = newQuote.i ? false : true;
           prop._noAuthor = newQuote.a ? false : true;
+          prop._hasCite  = newQuote.c ? true : false;
         }
+
+        /**
+         * Generate quote by INDEX (also used for testing). 
+         * @param {Element} prop, this web component element properties
+         * @param {Number} idx of item in the quote Array.
+         * Returns nothing, but invokes web component element properties
+         */
+        api.showByIndex = function (prop, idx) {
+          var newQuote;
+          // Sanitize check
+          if (isNaN(idx) || !(idx >= 0 && idx < this.count())) {
+            newQuote = {l:'EN', q:"Quote index '" + idx + "' out of range."};
+          } else {
+            newQuote = quotes[idx];
+          }
+
+          // Sanitize element properties.
+          prop._intro    = newQuote.i || '';
+          prop._quote    = newQuote.q || '';   // Fact: a quote is always provided
+          prop._author   = newQuote.a || '';
+          prop._cite     = newQuote.c || '';
+
+          prop._noIntro  = newQuote.i ? false : true;
+          prop._noAuthor = newQuote.a ? false : true;
+          prop._hasCite  = newQuote.c ? true : false;
+        }
+
+        /**
+         * @return an Array of available (registered) tags.
+         */
+        api.tagList = function () {
+          return quoteTags || scanTags();
+        };
+
+        /**
+         * @return the number of unique (registered) tags.
+         */
+        api.tagCount = function () {
+          quoteTags = quoteTags || scanTags();
+          return quoteTags.length;
+        };
 
         return api;
       })(),

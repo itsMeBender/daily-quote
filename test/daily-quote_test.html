@@ -21,6 +21,7 @@
     <script>
 
       // http://localhost:8081/components/daily-quote/test/daily-quote_test.html
+      // http://chaijs.com/api/bdd/#method_null
 
       suite('daily-quote', function() {
         var element;
@@ -35,47 +36,116 @@
 
 
 
-        test('B01 : Method quotes.count() ', function() {
+        test('B01 : Method quotes.count()', function() {
           // Bad test, outcome changes when QUOTE database is mutated
-          expect(element.quotes.count()).to.be.equal(271);
+          expect(element.quotes.count()).to.be.equal(288);
         });
         
-        test('B02 : Method quotes.languageCount() ', function() {
+        test('B02 : Method quotes.languageCount()', function() {
           // Bad test, outcome changes when QUOTE database is mutated
           expect(element.quotes.languageCount()).to.be.equal(2);
         });
 
-        test('B03 : Method quotes.tagCount() ', function() {
+        test('B03 : Method quotes.tagCount()', function() {
           // Bad test, outcome changes when QUOTE database is mutated
-          expect(element.quotes.tagCount()).to.be.equal(5);
+          expect(element.quotes.tagCount()).to.be.equal(6);
         });
 
-        test('B04 : Method quotes.languageList() ', function() {
+        test('B04 : Method quotes.languageList()', function() {
           // Bad test, outcome changes when QUOTE database is mutated
           expect(element.quotes.languageList().toString()).to.be.equal("EN,NL");
         });
 
-        test('B05 : Method quotes.tagList() ', function() {
+        test('B05 : Method quotes.tagList()', function() {
           // Bad test, outcome changes when QUOTE database is mutated
-          expect(element.quotes.tagList().toString()).to.be.equal("computer,office,life,science,funny");
+          expect(element.quotes.tagList().toString()).to.be.equal("computer,office,life,science,futurama,funny");
+        });
+
+        test('B06 : Method _showByIndex()', function(done) {
+          element._showByIndex(-1);
+          // Give <daily-quote>._showByIndex(), some time to do it's thing. Putting test on the JavaScript execution stack.
+          setTimeout(function () {
+            expect(element.$$("blockquote").innerHTML).to.be.equal("Quote index '-1' out of range.");
+            done();
+          }, 10);
+        });
+
+        test('B07 : Method _showByIndex(), maximum index', function(done) {
+          var mx = element.quotes.count();
+          element._showByIndex(mx);
+          // Give <daily-quote>._showByIndex(), some time to do it's thing. Putting test on the JavaScript execution stack.
+          setTimeout(function () {
+            expect(element.$$("blockquote").innerHTML).to.be.equal("Quote index '" + mx + "' out of range.");
+            done();
+          }, 10);
         });
 
 
 
         test('C01 : Response to unknown search tag', function(done) {
           element.show('tagDoesNotExist', 'EN');
-          // Give <daily-quote>.show(), some time to do it's thing. Putting test on the stack.
+          // Give <daily-quote>.show(), some time to do it's thing. Putting test on the JavaScript execution stack.
           setTimeout(function () {
-            expect(element.$$(".q--quote").innerHTML).to.be.equal("No quote found for combination, tag 'tagDoesNotExist' and or language 'EN'.");
+            expect(element.$$("blockquote").innerHTML).to.be.equal("No quote found for combination, tag 'tagDoesNotExist' and or language 'EN'.");
             done();
           }, 10);
         });
 
         test('C02 : Response to unknown language', function(done) {
           element.show('computer', 'XX');
-          // Give <daily-quote>.show(), some time to do it's thing. Putting test on the stack.
+          // Give <daily-quote>.show(), some time to do it's thing. Putting test on the JavaScript execution stack.
           setTimeout(function () {
-            expect(element.$$(".q--quote").innerHTML).to.be.equal("No quote available for language 'XX'.");
+            expect(element.$$("blockquote").innerHTML).to.be.equal("No quote available for language 'XX'.");
+            done();
+          }, 10);
+        });
+
+
+
+        test('Q01 : Test quote presention - intro, no cite', function(done) {
+          var mx = 34;  // Expecting quote {l:'EN', i:"Murphy's Corollary", q:"Left to themselves, things tend to go from bad to worse.", t:"science"},
+          element._showByIndex(mx);
+          // Give <daily-quote>._showByIndex(), some time to do it's thing. Putting test on the JavaScript execution stack.
+          setTimeout(function () {
+            expect(element.$$(".q--intro").innerHTML).to.be.equal("Murphy's Corollary");
+            expect(element.$$(".q--intro").hidden).to.be.false;
+            expect(element.$$("blockquote").innerHTML).to.be.equal("Left to themselves, things tend to go from bad to worse.");
+            expect(element.$$("blockquote").hidden).to.be.false;
+            expect(element.$$(".q--author").hidden).to.be.true;
+            expect(element.$$("blockquote").getAttribute("cite")).to.be.null;
+
+            done();
+          }, 10);
+        });
+
+        test('Q02 : Test quote presention - author, cite', function(done) {
+          var mx = 234;  // Expecting quote {l:'EN', i:"Murphy's Corollary", q:"Left to themselves, things tend to go from bad to worse.", t:"science"},
+          var bq;
+
+          element._showByIndex(mx);
+
+          // Give <daily-quote>._showByIndex(), some time to do it's thing. Putting test on the JavaScript execution stack.
+          setTimeout(function () {
+            expect(element.$$(".q--intro").hidden).to.be.true;
+
+            // There are TWO <blockquotes>, the first without 'cite'-attribute (Test Q01), the second with.
+            bq = element.$$("blockquote");
+            expect(bq.innerHTML).to.be.equal("That’s closest thing to ‘Bender is great’ that anyone other me has ever said.");
+            expect(bq.getAttribute("cite")).to.be.null;
+            expect(bq.hidden).to.be.true;
+
+            // The next <blockquote> is the active CITE one.
+            bq = bq.nextSibling;
+            while (bq && bq.nodeType != 1) {
+              bq = bq.nextSibling;
+            }
+            expect(bq.innerHTML).to.be.equal("That’s closest thing to ‘Bender is great’ that anyone other me has ever said.");
+            expect(bq.getAttribute("cite")).to.be.equal("http://futurama.wikia.com/wiki/List_of_Futurama_Websites");
+            expect(bq.hidden).to.be.false;
+
+            expect(element.$$(".q--author").innerHTML).to.be.equal("Bender, a bending robot");
+            expect(element.$$(".q--author").hidden).to.be.false;
+
             done();
           }, 10);
         });
