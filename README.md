@@ -21,11 +21,15 @@
 
 This element generates a quote of the day. You can get inspiration form this website [BrainyQuote](https://www.brainyquote.com/).  
 
-I decided to use my own set of quotes because of then language I use.
+I decided to use my own set of quotes because of the language I use.
 
 For me it's a nice project to sharpen my skills in; CSS3, Javascript, units tests, Polymer, Web Components and Raspberry Pi projects.  
 Because this quote of the day is used in my Magic Mirror project.
 
 ## Inner workings
 
-All quotes are bundled inside this element. You can add, change, delete the quotes in the code.
+All quotes are bundled inside this element. You can add, change, delete the quotes in the code.   
+
+Specifications;  
+* Show a random quote, depending on optional search tag and or langage.
+* Element intention is to work offline.  
