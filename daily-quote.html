@@ -18,7 +18,7 @@ Quote structure, if applicable;
 Mixin                  | Description         | Default
 -----------------------|---------------------|---------------------------
 `--quote-intro-theme`  | Quote introduction  | block; font:1.2em;
-`--quote-theme`        | Quote               | block; font:1.8em; margin;
+`--quote-theme`        | Quote               | font:1.8em;
 `--quote-author-theme` | Author of the quote | block; right; font:1.2em; italic; margin-right
 
 @demo demo/index.html 
@@ -35,14 +35,15 @@ Mixin                  | Description         | Default
         font-size: 1.2em;
         @apply --quote-intro-theme;
       }
-      .q--quote {
-        display: block;
+      blockquote {
         font-size: 1.8em;
-        margin: 0.4em 0 0.6em 0em;
         @apply --quote-theme;
       }
-      .q--quote:before {
+      blockquote:before {
         @apply --quote-theme--before;
+      }
+      blockquote:after {
+        @apply --quote-theme--after;
       }
       .q--author {
         display: block;
@@ -58,7 +59,7 @@ Mixin                  | Description         | Default
         <span class="q--intro">[[_intro]]</span>
       </template>
       <template is="dom-if" if="[[_hasContent(_quote)]]">
-        <span class="q--quote">[[_quote]]</span>
+        <blockquote class="q--quote">[[_quote]]</blockquote>
       </template>
       <template is="dom-if" if="[[_hasContent(_author)]]">
         <span class="q--author">[[_author]]</span>
