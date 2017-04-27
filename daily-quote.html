@@ -55,29 +55,15 @@ Mixin                  | Description         | Default
       }
     </style>
     <div> 
-      <template is="dom-if" if="[[_hasContent(_intro)]]">
-        <span class="q--intro">[[_intro]]</span>
-      </template>
-      <template is="dom-if" if="[[_hasContent(_quote)]]">
-        <blockquote class="q--quote">[[_quote]]</blockquote>
-      </template>
-      <template is="dom-if" if="[[_hasContent(_author)]]">
-        <span class="q--author">[[_author]]</span>
-      </template>
+        <span class="q--intro" hidden$="{{_noIntro}}">[[_intro]]</span>
+        <blockquote>[[_quote]]</blockquote>
+        <span class="q--author" hidden$="{{_noAuthor}}">[[_author]]</span>
     </div>
 
   </template>
 
   <script>
     Polymer({
-
-      // True when there is content to show.
-      _hasContent: function (content) {
-        if (content && content != '') {
-          return true;
-        }
-        return false;
-      },
 
       is: 'daily-quote',
 
@@ -104,6 +90,18 @@ Mixin                  | Description         | Default
         _quote: {
           type: String,
           value: '',
+        },
+
+        // Quote has no known author
+        _noAuthor: {
+          type: Boolean,
+          value: false,
+        },
+
+        // Quote has no introduction
+        _noIntro: {
+          type: Boolean,
+          value: false,
         },
 
         // The quote tag, like 'funny' tag
@@ -443,6 +441,13 @@ Mixin                  | Description         | Default
           return languages;
         }
 
+        /**
+         * Filter for quotes on tag (or contant as tag) and or language
+         * @param {String} tag to search for in tag property and text, author
+         * @param {String} language to find a quote in
+         * Return noting but fills the global 'filteredQuotes', an Array with quote indexes
+         * TODO: make it return something.
+         */
         function filterQuotes (tag, language) {
           var str;
 
@@ -464,7 +469,7 @@ Mixin                  | Description         | Default
             } else if (filterAppliedTag === '' && filterAppliedLanguage) {
               // Only filter on language
               quotes.forEach( function (quote, idx) {
-                if ((quote.l && quote.l === filterAppliedLanguage)) {
+                if ((quote.l && quote.l.toUpperCase() === filterAppliedLanguage)) {
                   filteredQuotes.push(idx);                
                 }
               });
@@ -480,7 +485,7 @@ Mixin                  | Description         | Default
                 str += quote.i || '';
 
                 if (filterAppliedLanguage) {
-                  if ((str.toLowerCase().indexOf(filterAppliedTag.toLowerCase()) >= 0) && (quote.l && quote.l === filterAppliedLanguage)) {
+                  if ((str.toLowerCase().indexOf(filterAppliedTag.toLowerCase()) >= 0) && (quote.l && quote.l.toUpperCase() === filterAppliedLanguage)) {
                     filteredQuotes.push(idx);                
                   }
                 } else {
@@ -543,9 +548,13 @@ Mixin                  | Description         | Default
             newQuote = pickOne(tag, language);
           }
 
-          prop._intro = newQuote.i || '';
-          prop._quote = newQuote.q || '';
-          prop._author = newQuote.a || '';
+          // Sanitize element properties.
+          prop._intro    = newQuote.i || '';
+          prop._quote    = newQuote.q || '';   // Fact: a quote is always provided
+          prop._author   = newQuote.a || '';
+
+          prop._noIntro  = newQuote.i ? false : true;
+          prop._noAuthor = newQuote.a ? false : true;
         }
 
         return api;

@@ -12,3 +12,9 @@ If you have other ideas, improvements, please add them. Maybe a live link to [Br
 
 Have fun,
 Pieter
+
+## Sponsoring
+
+I had some comments, remarks, improvements and ideas from the following people;
+
+> Dakmor, Matias, Colin.
